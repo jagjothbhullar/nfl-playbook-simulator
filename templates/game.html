@@ -726,6 +726,76 @@
             .phase-title h3 {
                 font-size: 0.9rem;
             }
+
+            /* Result screen mobile */
+            .result-screen {
+                padding: 15px;
+            }
+
+            .result-text {
+                font-size: 1.3rem;
+                margin-bottom: 10px;
+            }
+
+            .result-yards {
+                font-size: 2rem;
+                margin-bottom: 10px;
+            }
+
+            .result-detail {
+                font-size: 1rem;
+                margin-bottom: 10px;
+                line-height: 1.4;
+            }
+
+            .disguise-reveal {
+                font-size: 0.6rem;
+                padding: 8px 12px;
+                margin-bottom: 15px;
+                line-height: 1.4;
+            }
+
+            .next-btn {
+                font-size: 0.8rem;
+                padding: 15px 30px;
+            }
+
+            /* Game over mobile */
+            .game-over {
+                padding: 20px;
+            }
+
+            .game-over h2 {
+                font-size: 1.5rem;
+                margin-bottom: 15px;
+            }
+
+            .game-over .final-score {
+                font-size: 2.5rem;
+                margin-bottom: 15px;
+            }
+
+            .game-over .stats {
+                font-size: 1rem;
+                margin-bottom: 20px;
+            }
+
+            .play-again-btn {
+                font-size: 0.9rem;
+                padding: 15px 30px;
+            }
+
+            /* Back button mobile */
+            .back-btn {
+                font-size: 0.6rem;
+                padding: 10px 15px;
+                margin-top: 10px;
+            }
+
+            /* Blitz warning mobile */
+            .blitz-warning {
+                font-size: 0.6rem;
+            }
         }
 
         /* Extra small screens */
@@ -772,13 +842,55 @@
                 font-size: 0.4rem;
             }
 
-            .result-overlay .result-content {
-                padding: 20px;
-                max-width: 95%;
+            /* Result screen extra small */
+            .result-text {
+                font-size: 1.1rem;
             }
 
-            .result-overlay .result-yardage {
+            .result-yards {
+                font-size: 1.6rem;
+            }
+
+            .result-detail {
+                font-size: 0.9rem;
+            }
+
+            .disguise-reveal {
+                font-size: 0.55rem;
+                padding: 6px 10px;
+            }
+
+            .next-btn {
+                font-size: 0.7rem;
+                padding: 12px 20px;
+            }
+
+            /* Game over extra small */
+            .game-over h2 {
+                font-size: 1.2rem;
+            }
+
+            .game-over .final-score {
                 font-size: 2rem;
+            }
+
+            .game-over .stats {
+                font-size: 0.85rem;
+            }
+
+            .play-again-btn {
+                font-size: 0.8rem;
+                padding: 12px 25px;
+            }
+
+            /* Formation buttons extra small */
+            .formation-btn {
+                padding: 12px 8px;
+                font-size: 0.65rem;
+            }
+
+            .formation-btn .desc {
+                font-size: 0.8rem;
             }
         }
 
@@ -1713,6 +1825,21 @@
             const warning = document.createElement('div');
             warning.className = 'delayed-blitz-flash';
             warning.innerHTML = 'THEY\'RE BRINGING PRESSURE!';
+
+            // Check screen size for responsive styling
+            const isMobile = window.innerWidth <= 480;
+            const isSmall = window.innerWidth <= 700;
+
+            let fontSize = '1.2rem';
+            let padding = '20px 40px';
+            if (isMobile) {
+                fontSize = '0.7rem';
+                padding = '12px 20px';
+            } else if (isSmall) {
+                fontSize = '0.9rem';
+                padding = '15px 25px';
+            }
+
             warning.style.cssText = `
                 position: fixed;
                 top: 50%;
@@ -1721,11 +1848,12 @@
                 background: rgba(255, 0, 0, 0.9);
                 color: #fff;
                 font-family: 'Press Start 2P', cursive;
-                font-size: 1.2rem;
-                padding: 20px 40px;
+                font-size: ${fontSize};
+                padding: ${padding};
                 border: 4px solid #ffff00;
                 z-index: 2000;
                 text-align: center;
+                max-width: 90%;
                 animation: blitzFlash 0.5s ease-out forwards;
             `;
             document.body.appendChild(warning);
