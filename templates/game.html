@@ -542,6 +542,34 @@
         .route-legend .short { background: #ffff00; }
         .route-legend .other { background: #00bfff; }
 
+        /* Back Button */
+        .back-btn {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 0.7rem;
+            padding: 12px 20px;
+            background: transparent;
+            border: 2px solid #ff6600;
+            color: #ff6600;
+            cursor: pointer;
+            margin-top: 15px;
+            transition: all 0.1s;
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 102, 0, 0.2);
+            border-color: #ffff00;
+            color: #ffff00;
+        }
+
+        /* Blitz Warning */
+        .blitz-warning {
+            color: #ff0000;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 0.7rem;
+            animation: blink 0.5s infinite;
+            margin-top: 5px;
+        }
+
         /* Responsive */
         @media (max-width: 900px) {
             .play-grid {
@@ -649,6 +677,7 @@
                 <div class="defense-display">
                     <div class="label">THE DEFENSE IS SHOWING...</div>
                     <div class="defense-name" id="defenseName">NICKEL COVER 3</div>
+                    <div class="blitz-warning" id="blitzWarning" style="display: none;">BLITZ INCOMING! GET RID OF IT FAST!</div>
                 </div>
                 <div class="phase-title">
                     <h3>PICK YOUR FORMATION!</h3>
@@ -672,6 +701,7 @@
                     <div class="legend-item"><span class="legend-color other"></span> Medium</div>
                 </div>
                 <div class="play-grid" id="playGrid"></div>
+                <button class="back-btn" onclick="goBackToFormation()">< BACK</button>
             </div>
 
             <!-- Receiver Selection -->
@@ -740,16 +770,27 @@
 
         // Game Data
         const defenses = [
-            { formation: '4-3', coverage: 'cover_3', name: '4-3 COVER 3' },
-            { formation: 'nickel', coverage: 'cover_3', name: 'NICKEL COVER 3' },
-            { formation: 'nickel', coverage: 'cover_2', name: 'NICKEL COVER 2' },
-            { formation: 'nickel', coverage: 'cover_1', name: 'NICKEL COVER 1' },
-            { formation: 'nickel', coverage: 'cover_4', name: 'NICKEL COVER 4' },
-            { formation: 'dime', coverage: 'cover_2', name: 'DIME COVER 2' },
-            { formation: 'dime', coverage: 'cover_3', name: 'DIME COVER 3' },
-            { formation: '4-3', coverage: 'cover_1', name: '4-3 COVER 1' },
-            { formation: '4-3', coverage: 'cover_2', name: '4-3 COVER 2' },
-            { formation: '3-4', coverage: 'cover_3', name: '3-4 COVER 3' }
+            // Zone Coverages
+            { formation: '4-3', coverage: 'cover_3', name: '4-3 COVER 3', blitz: false },
+            { formation: 'nickel', coverage: 'cover_3', name: 'NICKEL COVER 3', blitz: false },
+            { formation: 'nickel', coverage: 'cover_2', name: 'NICKEL COVER 2', blitz: false },
+            { formation: 'nickel', coverage: 'cover_4', name: 'NICKEL COVER 4', blitz: false },
+            { formation: 'dime', coverage: 'cover_2', name: 'DIME COVER 2', blitz: false },
+            { formation: 'dime', coverage: 'cover_3', name: 'DIME COVER 3', blitz: false },
+            { formation: '4-3', coverage: 'cover_2', name: '4-3 COVER 2', blitz: false },
+            { formation: '3-4', coverage: 'cover_3', name: '3-4 COVER 3', blitz: false },
+            // Man Coverages
+            { formation: 'nickel', coverage: 'cover_0', name: 'NICKEL COVER 0 MAN', blitz: false },
+            { formation: 'nickel', coverage: 'cover_1', name: 'NICKEL COVER 1 MAN', blitz: false },
+            { formation: '4-3', coverage: 'cover_1', name: '4-3 COVER 1 MAN', blitz: false },
+            { formation: 'dime', coverage: 'cover_0', name: 'DIME COVER 0 MAN', blitz: false },
+            // Blitz Packages - reduced time to throw!
+            { formation: 'nickel', coverage: 'cover_1', name: 'NICKEL MAN BLITZ', blitz: true, blitzType: 'LB Blitz' },
+            { formation: 'nickel', coverage: 'cover_0', name: 'NICKEL ZERO BLITZ', blitz: true, blitzType: 'All-Out Blitz' },
+            { formation: '4-3', coverage: 'cover_1', name: '4-3 SAM BLITZ', blitz: true, blitzType: 'Edge Blitz' },
+            { formation: '3-4', coverage: 'cover_1', name: '3-4 FIRE ZONE', blitz: true, blitzType: 'Zone Blitz' },
+            { formation: 'dime', coverage: 'cover_0', name: 'DIME DB BLITZ', blitz: true, blitzType: 'Corner Blitz' },
+            { formation: 'nickel', coverage: 'cover_3', name: 'NICKEL ZONE BLITZ', blitz: true, blitzType: 'Zone Blitz' }
         ];
 
         const formations = {
@@ -1224,11 +1265,26 @@
             showScreen('defenseScreen');
             document.getElementById('defenseName').textContent = gameState.currentDefense.name;
 
+            // Show blitz warning if it's a blitz
+            const blitzWarning = document.getElementById('blitzWarning');
+            if (gameState.currentDefense.blitz) {
+                blitzWarning.style.display = 'block';
+                blitzWarning.textContent = `${gameState.currentDefense.blitzType.toUpperCase()}! GET RID OF IT FAST!`;
+            } else {
+                blitzWarning.style.display = 'none';
+            }
+
             // Generate formation buttons
             generateFormationButtons();
 
             // Start timer
             startTimer(15, onFormationTimeout);
+        }
+
+        function goBackToFormation() {
+            // Go back to formation selection WITHOUT resetting timer
+            showScreen('defenseScreen');
+            gameState.currentFormation = null;
         }
 
         function generateFormationButtons() {
@@ -1297,13 +1353,20 @@
 
             // Show receiver selection
             showScreen('receiverScreen');
-            document.getElementById('playCallName').textContent = play.name;
+
+            // Show blitz warning on receiver screen too
+            let playLabel = play.name;
+            if (gameState.currentDefense.blitz) {
+                playLabel += ' - BLITZ COMING!';
+            }
+            document.getElementById('playCallName').textContent = playLabel;
 
             // Generate receiver buttons on field
             generateReceiverButtons();
 
-            // Start timer
-            startTimer(15, onReceiverTimeout);
+            // Start timer - SHORTER if blitz!
+            const blitzTimer = gameState.currentDefense.blitz ? 8 : 15;
+            startTimer(blitzTimer, onReceiverTimeout);
         }
 
         function generateReceiverButtons() {
@@ -1384,21 +1447,126 @@
             resolvePassPlay(receiver);
         }
 
+        // Coverage-specific explanations
+        const coverageExplanations = {
+            cover_0: {
+                name: 'Cover 0 Man',
+                perfect: {
+                    'Slant': 'Quick slant beat the press coverage before help arrived!',
+                    'Go': 'Burned the corner deep with no safety help!',
+                    'Post': 'Post route found the void - no safety over the top!',
+                    'Cross': 'Crossing route created separation in man coverage!'
+                },
+                good: {
+                    'Dig': 'Dig route found a seam in the man coverage.',
+                    'Corner': 'Corner route worked against single coverage.',
+                    'Out': 'Quick out beat the defender to the sideline.'
+                },
+                bad: {
+                    'Curl': 'Curl sat too long - the man defender was all over it!',
+                    'Hitch': 'Hitch route got jumped by the press corner!',
+                    'Sit': 'The defender was in perfect position on the sit route.'
+                }
+            },
+            cover_1: {
+                name: 'Cover 1 Man',
+                perfect: {
+                    'Cross': 'Crossing route beat the man defender and the safety was late!',
+                    'Shallow': 'Shallow cross was open underneath the safety.',
+                    'Dig': 'Dig route found the hole behind the linebacker!',
+                    'Drag': 'Drag route ran away from man coverage.',
+                    'Post': 'Post route split the safety - big play!'
+                },
+                good: {
+                    'Corner': 'Corner route worked against the single-high look.',
+                    'Seam': 'Seam found a window past the safety.',
+                    'Out': 'Out route created separation.'
+                },
+                bad: {
+                    'Go': 'Go route ran right into the deep safety!',
+                    'Hitch': 'Hitch was blanketed by tight man coverage.',
+                    'Curl': 'Curl gave the defender time to close.'
+                }
+            },
+            cover_2: {
+                name: 'Cover 2 Zone',
+                perfect: {
+                    'Seam': 'Seam route split the safeties perfectly!',
+                    'Post': 'Post found the hole between the safeties!',
+                    'Corner': 'Corner route beat the safety to the sideline!',
+                    'Dig': 'Dig route found the soft spot in the zone.'
+                },
+                good: {
+                    'Curl': 'Curl sat in the zone between defenders.',
+                    'Out': 'Out route got under the corner.'
+                },
+                bad: {
+                    'Go': 'Go route ran right into the deep safety!',
+                    'Flat': 'Flat was jumped by the corner dropping to the flat!',
+                    'Hitch': 'Hitch was covered by the underneath zone.',
+                    'Shallow': 'The linebacker was sitting on the shallow route.'
+                }
+            },
+            cover_3: {
+                name: 'Cover 3 Zone',
+                perfect: {
+                    'Seam': 'Seam route found the hole between the corner and safety!',
+                    'Curl': 'Curl sat perfectly in the soft spot of Cover 3!',
+                    'Flat': 'Flat route got outside before the corner could react!',
+                    'Shallow': 'Shallow cross ran under the dropping linebackers!',
+                    'Cross': 'Crossing route found open grass in the zone!'
+                },
+                good: {
+                    'Dig': 'Dig found a window in the zone.',
+                    'Out': 'Out route worked against the zone.',
+                    'Corner': 'Corner found space in the deep third.'
+                },
+                bad: {
+                    'Go': 'Go route ran into the deep third coverage!',
+                    'Post': 'Post went right at the deep safety!',
+                    'Hitch': 'Hitch was bracketed by zone defenders.'
+                }
+            },
+            cover_4: {
+                name: 'Cover 4 Zone',
+                perfect: {
+                    'Flat': 'Flat route got wide open - 4 deep means no flat defender!',
+                    'Curl': 'Curl found the huge void in Cover 4!',
+                    'Hitch': 'Hitch was wide open underneath the deep coverage!',
+                    'Out': 'Out route had acres of space!',
+                    'Shallow': 'Shallow route had the whole middle of the field!'
+                },
+                good: {
+                    'Drag': 'Drag found room under the coverage.',
+                    'Cross': 'Cross worked against the soft zone.',
+                    'Slant': 'Slant got in before the zone could react.'
+                },
+                bad: {
+                    'Go': 'Go route had a safety over the top waiting!',
+                    'Seam': 'Seam ran right into the quarter coverage!',
+                    'Post': 'Post was blanketed by the safety.',
+                    'Corner': 'Corner route had two defenders in the area!'
+                }
+            }
+        };
+
         function resolvePassPlay(receiver) {
             const coverage = gameState.currentDefense.coverage;
             const matchup = coverageMatchups[coverage] || coverageMatchups.cover_3;
+            const explanations = coverageExplanations[coverage] || coverageExplanations.cover_3;
 
             let result;
             const route = receiver.route;
+            const isBlitz = gameState.currentDefense.blitz;
 
             if (matchup.perfect.some(r => route.includes(r))) {
-                result = calculatePerfectRead(receiver.depth);
+                result = calculatePerfectRead(receiver, coverage, explanations, isBlitz);
                 gameState.perfectReads++;
             } else if (matchup.good.some(r => route.includes(r))) {
-                result = calculateGoodRead(receiver.depth);
+                result = calculateGoodRead(receiver, coverage, explanations, isBlitz);
                 gameState.goodReads++;
             } else {
-                result = calculateBadRead();
+                result = calculateBadRead(receiver, coverage, explanations, isBlitz);
                 gameState.badReads++;
             }
 
@@ -1408,12 +1576,17 @@
         function resolveRunPlay() {
             const coverage = gameState.currentDefense.coverage;
             const formation = gameState.currentDefense.formation;
+            const isBlitz = gameState.currentDefense.blitz;
 
             // Run effectiveness based on defense
             let baseYards = Math.floor(Math.random() * 6) + 2; // 2-7 yards base
 
+            // Blitzes are great to run against
+            if (isBlitz) {
+                baseYards += Math.floor(Math.random() * 6) + 4;
+            }
             // Dime = good for run
-            if (formation === 'dime') {
+            else if (formation === 'dime') {
                 baseYards += Math.floor(Math.random() * 5) + 3;
             }
             // Nickel = okay for run
@@ -1428,51 +1601,113 @@
             baseYards = Math.max(baseYards, -2);
 
             let result;
-            if (baseYards >= 8) {
-                result = { type: 'big-play', yards: baseYards, message: 'HUGE HOLE! Great blocking!', detail: 'The defense was spread thin!' };
-                gameState.goodReads++;
+            if (baseYards >= 10) {
+                const detail = isBlitz ? 'The blitz left a huge running lane!' : 'The defense was spread thin - dime package can\'t stop the run!';
+                result = { type: 'big-play', yards: baseYards, message: 'HUGE HOLE!', detail };
+                gameState.perfectReads++;
             } else if (baseYards >= 4) {
-                result = { type: 'good-play', yards: baseYards, message: 'SOLID GAIN!', detail: 'Good downhill running!' };
+                const detail = isBlitz ? 'Good call running against the blitz!' : 'Solid downhill running against light personnel!';
+                result = { type: 'good-play', yards: baseYards, message: 'SOLID GAIN!', detail };
                 gameState.goodReads++;
             } else if (baseYards >= 0) {
-                result = { type: 'bad-play', yards: baseYards, message: 'STUFFED!', detail: 'The defense read it well.' };
+                result = { type: 'bad-play', yards: baseYards, message: 'STUFFED!', detail: 'The linebackers filled the gap quickly.' };
                 gameState.badReads++;
             } else {
-                result = { type: 'bad-play', yards: baseYards, message: 'LOSS!', detail: 'Hit in the backfield!' };
+                result = { type: 'bad-play', yards: baseYards, message: 'LOSS!', detail: 'The defense blew it up in the backfield!' };
                 gameState.badReads++;
             }
 
             showResult(result);
         }
 
-        function calculatePerfectRead(depth) {
+        function calculatePerfectRead(receiver, coverage, explanations, isBlitz) {
             const yards = Math.floor(Math.random() * 26) + 15; // 15-40 yards
+
+            // Find specific explanation for this route
+            let detail = 'Wide open! The coverage couldn\'t handle it!';
+            const route = receiver.route;
+
+            // Check for specific route explanation
+            for (const [routeType, explanation] of Object.entries(explanations.perfect || {})) {
+                if (route.includes(routeType)) {
+                    detail = explanation;
+                    break;
+                }
+            }
+
+            if (isBlitz) {
+                detail += ' The blitz left them vulnerable!';
+            }
+
             return {
                 type: 'big-play',
                 yards: yards,
                 message: 'PERFECT READ!',
-                detail: 'Wide open! The coverage couldn\'t handle it!'
+                detail: detail
             };
         }
 
-        function calculateGoodRead(depth) {
+        function calculateGoodRead(receiver, coverage, explanations, isBlitz) {
             const yards = Math.floor(Math.random() * 11) + 5; // 5-15 yards
+
+            let detail = 'Found a soft spot in the coverage.';
+            const route = receiver.route;
+
+            // Check for specific route explanation
+            for (const [routeType, explanation] of Object.entries(explanations.good || {})) {
+                if (route.includes(routeType)) {
+                    detail = explanation;
+                    break;
+                }
+            }
+
             return {
                 type: 'good-play',
                 yards: yards,
                 message: 'GOOD READ!',
-                detail: 'Found the soft spot in the zone!'
+                detail: detail
             };
         }
 
-        function calculateBadRead() {
+        function calculateBadRead(receiver, coverage, explanations, isBlitz) {
             const roll = Math.random();
+            const route = receiver.route;
+            const coverageName = explanations.name || 'the coverage';
+
+            // Find specific bad route explanation
+            let badDetail = `The ${route} route was covered by ${coverageName}.`;
+            for (const [routeType, explanation] of Object.entries(explanations.bad || {})) {
+                if (route.includes(routeType)) {
+                    badDetail = explanation;
+                    break;
+                }
+            }
+
             if (roll < 0.3) {
-                return { type: 'turnover', yards: 0, message: 'INTERCEPTED!', detail: 'The defender was sitting on that route!', turnover: true };
+                return {
+                    type: 'turnover',
+                    yards: 0,
+                    message: 'INTERCEPTED!',
+                    detail: badDetail + ' The defender jumped the route!',
+                    turnover: true
+                };
             } else if (roll < 0.6) {
-                return { type: 'bad-play', yards: -7, message: 'SACKED!', detail: 'Held the ball too long!' };
+                const sackDetail = isBlitz
+                    ? `The ${gameState.currentDefense.blitzType} got home! No time to throw!`
+                    : 'Held the ball too long looking for an open receiver.';
+                return {
+                    type: 'bad-play',
+                    yards: -7,
+                    message: 'SACKED!',
+                    detail: sackDetail
+                };
             } else {
-                return { type: 'bad-play', yards: 0, message: 'INCOMPLETE!', detail: 'Tight coverage, nowhere to go.' };
+                return {
+                    type: 'bad-play',
+                    yards: 0,
+                    message: 'INCOMPLETE!',
+                    detail: badDetail
+                };
             }
         }
 
