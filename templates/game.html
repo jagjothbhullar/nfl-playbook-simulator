@@ -1404,8 +1404,8 @@
             // Generate receiver buttons on field
             generateReceiverButtons();
 
-            // Start timer - SHORTER if blitz!
-            const blitzTimer = gameState.currentDefense.blitz ? 8 : 15;
+            // Start timer - MUCH SHORTER if blitz! Pressure is coming!
+            const blitzTimer = gameState.currentDefense.blitz ? 5 : 15;
             startTimer(blitzTimer, onReceiverTimeout);
         }
 
