@@ -1,0 +1,1621 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GRIDIRON BLITZ - Beat The Defense!</title>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+    <style>
+        @keyframes scanline {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(100vh); }
+        }
+
+        @keyframes flicker {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.98; }
+        }
+
+        @keyframes neonPulse {
+            0%, 100% { text-shadow: 0 0 10px currentColor, 0 0 20px currentColor, 0 0 30px currentColor; }
+            50% { text-shadow: 0 0 5px currentColor, 0 0 10px currentColor, 0 0 15px currentColor; }
+        }
+
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0; }
+        }
+
+        @keyframes countdownPulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'VT323', monospace;
+            background: #0a0a0a;
+            min-height: 100vh;
+            color: #00ff00;
+            overflow: hidden;
+            animation: flicker 0.15s infinite;
+        }
+
+        /* CRT Scanline Effect */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: repeating-linear-gradient(
+                0deg,
+                rgba(0, 0, 0, 0.15),
+                rgba(0, 0, 0, 0.15) 1px,
+                transparent 1px,
+                transparent 2px
+            );
+            pointer-events: none;
+            z-index: 1000;
+        }
+
+        /* CRT Curve Effect */
+        body::after {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(ellipse at center, transparent 0%, rgba(0,0,0,0.4) 100%);
+            pointer-events: none;
+            z-index: 999;
+        }
+
+        .game-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 10px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Header / Score Bar */
+        .score-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: linear-gradient(180deg, #1a0a2e 0%, #0d0520 100%);
+            border: 4px solid #ff00ff;
+            border-radius: 0;
+            padding: 15px 25px;
+            margin-bottom: 15px;
+            box-shadow: 0 0 20px rgba(255, 0, 255, 0.5), inset 0 0 30px rgba(255, 0, 255, 0.1);
+        }
+
+        .game-title {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 1.2rem;
+            color: #ff00ff;
+            text-shadow: 0 0 10px #ff00ff, 0 0 20px #ff00ff;
+            animation: neonPulse 2s ease-in-out infinite;
+        }
+
+        .score-display {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 1.5rem;
+            color: #ffff00;
+            text-shadow: 0 0 10px #ffff00;
+        }
+
+        /* Game Info Bar */
+        .info-bar {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .info-box {
+            background: #0d0d1a;
+            border: 3px solid #00ffff;
+            padding: 15px;
+            text-align: center;
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
+        }
+
+        .info-box .label {
+            font-size: 0.9rem;
+            color: #00ffff;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+        }
+
+        .info-box .value {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 1.3rem;
+            color: #fff;
+            text-shadow: 0 0 10px #fff;
+        }
+
+        .info-box.timer .value {
+            color: #ff0000;
+            animation: countdownPulse 1s ease-in-out infinite;
+        }
+
+        .info-box.timer.warning .value {
+            color: #ff0000;
+            animation: blink 0.5s infinite;
+        }
+
+        /* Main Game Area */
+        .game-area {
+            background: linear-gradient(180deg, #0a1a0a 0%, #051505 100%);
+            border: 4px solid #00ff00;
+            padding: 20px;
+            min-height: 450px;
+            position: relative;
+            box-shadow: 0 0 30px rgba(0, 255, 0, 0.3), inset 0 0 50px rgba(0, 255, 0, 0.05);
+        }
+
+        /* Defense Display */
+        .defense-display {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .defense-display .label {
+            font-size: 1.2rem;
+            color: #ff6600;
+            margin-bottom: 10px;
+        }
+
+        .defense-display .defense-name {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 1.8rem;
+            color: #ff0000;
+            text-shadow: 0 0 20px #ff0000, 0 0 40px #ff0000;
+            padding: 15px;
+            background: rgba(255, 0, 0, 0.1);
+            border: 2px solid #ff0000;
+            display: inline-block;
+        }
+
+        /* Phase Screens */
+        .phase-screen {
+            display: none;
+        }
+
+        .phase-screen.active {
+            display: block;
+        }
+
+        /* Formation Selection */
+        .formation-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .formation-btn {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 0.9rem;
+            padding: 25px 20px;
+            background: linear-gradient(180deg, #1a1a3a 0%, #0d0d2a 100%);
+            border: 3px solid #00ffff;
+            color: #00ffff;
+            cursor: pointer;
+            transition: all 0.1s;
+            text-transform: uppercase;
+        }
+
+        .formation-btn:hover {
+            background: linear-gradient(180deg, #2a2a5a 0%, #1a1a4a 100%);
+            border-color: #ffff00;
+            color: #ffff00;
+            transform: scale(1.02);
+            box-shadow: 0 0 20px rgba(255, 255, 0, 0.5);
+        }
+
+        .formation-btn .desc {
+            font-family: 'VT323', monospace;
+            font-size: 1rem;
+            margin-top: 10px;
+            color: #888;
+        }
+
+        /* Play Selection */
+        .play-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 12px;
+            max-width: 950px;
+            margin: 0 auto;
+        }
+
+        .play-btn {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 0.55rem;
+            padding: 8px;
+            background: linear-gradient(180deg, #1a2a1a 0%, #0d1a0d 100%);
+            border: 3px solid #00ff00;
+            color: #00ff00;
+            cursor: pointer;
+            transition: all 0.1s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .play-btn:hover {
+            background: linear-gradient(180deg, #2a4a2a 0%, #1a3a1a 100%);
+            border-color: #ffff00;
+            color: #ffff00;
+            box-shadow: 0 0 20px rgba(0, 255, 0, 0.5);
+            transform: scale(1.05);
+        }
+
+        .play-btn .play-diagram {
+            width: 100%;
+            height: 120px;
+            margin-bottom: 5px;
+        }
+
+        .play-btn .play-name {
+            margin-top: 5px;
+        }
+
+        .play-btn .type {
+            font-family: 'VT323', monospace;
+            font-size: 0.9rem;
+            color: #888;
+            margin-top: 4px;
+        }
+
+        /* Receiver Selection */
+        .field-diagram {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            height: 350px;
+            margin: 0 auto;
+            background: linear-gradient(180deg, #1a3a1a 0%, #0d2a0d 100%);
+            border: 3px solid #fff;
+        }
+
+        .route-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 5;
+        }
+
+        .field-lines {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+        }
+
+        .field-lines::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .receiver-btn {
+            position: absolute;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 0.6rem;
+            padding: 12px 8px;
+            background: #0066ff;
+            border: 3px solid #00ffff;
+            color: #fff;
+            cursor: pointer;
+            border-radius: 50%;
+            width: 80px;
+            height: 80px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.1s;
+            z-index: 10;
+        }
+
+        .receiver-btn:hover {
+            background: #ffff00;
+            color: #000;
+            transform: scale(1.15);
+            box-shadow: 0 0 30px rgba(255, 255, 0, 0.8);
+        }
+
+        .receiver-btn .route {
+            font-family: 'VT323', monospace;
+            font-size: 0.8rem;
+            margin-top: 4px;
+        }
+
+        .qb-marker {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-family: 'Press Start 2P', cursive;
+            font-size: 0.7rem;
+            padding: 10px;
+            background: #ffd700;
+            border: 2px solid #fff;
+            color: #000;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Result Screen */
+        .result-screen {
+            text-align: center;
+            padding: 30px;
+        }
+
+        .result-text {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 2rem;
+            margin-bottom: 20px;
+            animation: neonPulse 1s ease-in-out infinite;
+        }
+
+        .result-text.big-play { color: #00ff00; }
+        .result-text.good-play { color: #ffff00; }
+        .result-text.bad-play { color: #ff6600; }
+        .result-text.turnover { color: #ff0000; }
+        .result-text.touchdown { color: #ff00ff; }
+
+        .result-yards {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 3rem;
+            color: #fff;
+            text-shadow: 0 0 20px #fff;
+            margin-bottom: 20px;
+        }
+
+        .result-detail {
+            font-size: 1.5rem;
+            color: #aaa;
+            margin-bottom: 30px;
+        }
+
+        .next-btn {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 1rem;
+            padding: 20px 40px;
+            background: linear-gradient(180deg, #ff00ff 0%, #aa00aa 100%);
+            border: 3px solid #fff;
+            color: #fff;
+            cursor: pointer;
+            animation: neonPulse 2s ease-in-out infinite;
+        }
+
+        .next-btn:hover {
+            transform: scale(1.05);
+        }
+
+        /* Game Over Screen */
+        .game-over {
+            text-align: center;
+            padding: 40px;
+        }
+
+        .game-over h2 {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 2.5rem;
+            color: #ff00ff;
+            margin-bottom: 30px;
+            animation: neonPulse 1s ease-in-out infinite;
+        }
+
+        .game-over .final-score {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 4rem;
+            color: #ffff00;
+            text-shadow: 0 0 30px #ffff00;
+            margin-bottom: 20px;
+        }
+
+        .game-over .stats {
+            font-size: 1.5rem;
+            color: #aaa;
+            margin-bottom: 30px;
+        }
+
+        .play-again-btn {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 1.2rem;
+            padding: 25px 50px;
+            background: linear-gradient(180deg, #00ff00 0%, #00aa00 100%);
+            border: 4px solid #fff;
+            color: #000;
+            cursor: pointer;
+        }
+
+        .play-again-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 30px rgba(0, 255, 0, 0.8);
+        }
+
+        /* Start Screen */
+        .start-screen {
+            text-align: center;
+            padding: 50px 20px;
+        }
+
+        .start-screen h1 {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 2.5rem;
+            color: #ff00ff;
+            margin-bottom: 30px;
+            animation: neonPulse 2s ease-in-out infinite;
+            line-height: 1.5;
+        }
+
+        .start-screen .instructions {
+            font-size: 1.4rem;
+            color: #00ffff;
+            margin-bottom: 40px;
+            line-height: 2;
+        }
+
+        .start-screen .instructions span {
+            color: #ffff00;
+        }
+
+        .start-btn {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 1.5rem;
+            padding: 30px 60px;
+            background: linear-gradient(180deg, #ff0000 0%, #aa0000 100%);
+            border: 4px solid #ffff00;
+            color: #fff;
+            cursor: pointer;
+            animation: countdownPulse 1s ease-in-out infinite;
+        }
+
+        .start-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 40px rgba(255, 0, 0, 0.8);
+        }
+
+        /* Phase Title */
+        .phase-title {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .phase-title h3 {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 1.1rem;
+            color: #ffff00;
+            text-shadow: 0 0 10px #ffff00;
+        }
+
+        /* Route Legend */
+        .route-legend {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 15px;
+            font-size: 0.9rem;
+        }
+
+        .route-legend .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .route-legend .legend-color {
+            width: 20px;
+            height: 4px;
+            border-radius: 2px;
+        }
+
+        .route-legend .deep { background: #ff4444; }
+        .route-legend .cross { background: #00ff00; }
+        .route-legend .short { background: #ffff00; }
+        .route-legend .other { background: #00bfff; }
+
+        /* Responsive */
+        @media (max-width: 900px) {
+            .play-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+
+            .play-btn {
+                font-size: 0.5rem;
+            }
+
+            .play-btn .play-diagram {
+                height: 100px;
+            }
+        }
+
+        @media (max-width: 700px) {
+            .formation-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .play-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .game-title {
+                font-size: 0.8rem;
+            }
+
+            .info-bar {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .field-diagram {
+                height: 400px;
+            }
+
+            .receiver-btn {
+                width: 65px;
+                height: 65px;
+                font-size: 0.5rem;
+            }
+
+            .play-btn .play-diagram {
+                height: 90px;
+            }
+
+            .route-legend {
+                flex-wrap: wrap;
+                gap: 10px;
+                font-size: 0.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <!-- Score Bar -->
+        <div class="score-bar">
+            <div class="game-title">GRIDIRON BLITZ</div>
+            <div class="score-display">SCORE: <span id="score">0</span></div>
+        </div>
+
+        <!-- Info Bar -->
+        <div class="info-bar">
+            <div class="info-box">
+                <div class="label">Down</div>
+                <div class="value" id="down">1st</div>
+            </div>
+            <div class="info-box">
+                <div class="label">To Go</div>
+                <div class="value" id="toGo">40</div>
+            </div>
+            <div class="info-box">
+                <div class="label">Ball On</div>
+                <div class="value" id="ballOn">40</div>
+            </div>
+            <div class="info-box timer" id="timerBox">
+                <div class="label">Time</div>
+                <div class="value" id="timer">15</div>
+            </div>
+        </div>
+
+        <!-- Main Game Area -->
+        <div class="game-area">
+            <!-- Start Screen -->
+            <div class="phase-screen active" id="startScreen">
+                <div class="start-screen">
+                    <h1>GRIDIRON<br>BLITZ</h1>
+                    <div class="instructions">
+                        <span>4 DOWNS</span> to score from the <span>40 YARD LINE</span><br>
+                        Read the defense. Pick your play.<br>
+                        Choose your target. <span>BEAT THE COVERAGE!</span><br><br>
+                        <span>PERFECT READ</span> = BIG PLAY (15-40 YDS)<br>
+                        GOOD READ = SOLID GAIN (5-15 YDS)<br>
+                        <span style="color:#ff6600">BAD READ</span> = SACK or PICK!
+                    </div>
+                    <button class="start-btn" onclick="startGame()">
+                        INSERT COIN<br>TO START
+                    </button>
+                </div>
+            </div>
+
+            <!-- Defense Reveal -->
+            <div class="phase-screen" id="defenseScreen">
+                <div class="defense-display">
+                    <div class="label">THE DEFENSE IS SHOWING...</div>
+                    <div class="defense-name" id="defenseName">NICKEL COVER 3</div>
+                </div>
+                <div class="phase-title">
+                    <h3>PICK YOUR FORMATION!</h3>
+                </div>
+                <div class="formation-grid" id="formationGrid"></div>
+            </div>
+
+            <!-- Play Selection -->
+            <div class="phase-screen" id="playScreen">
+                <div class="defense-display">
+                    <div class="label">DEFENSE:</div>
+                    <div class="defense-name" id="defenseNamePlay" style="font-size: 1.2rem;"></div>
+                </div>
+                <div class="phase-title">
+                    <h3>PICK YOUR PLAY!</h3>
+                </div>
+                <div class="route-legend">
+                    <div class="legend-item"><span class="legend-color deep"></span> Deep</div>
+                    <div class="legend-item"><span class="legend-color cross"></span> Cross</div>
+                    <div class="legend-item"><span class="legend-color short"></span> Short</div>
+                    <div class="legend-item"><span class="legend-color other"></span> Medium</div>
+                </div>
+                <div class="play-grid" id="playGrid"></div>
+            </div>
+
+            <!-- Receiver Selection -->
+            <div class="phase-screen" id="receiverScreen">
+                <div class="defense-display">
+                    <div class="label" id="playCallLabel">PLAY:</div>
+                    <div class="defense-name" id="playCallName" style="font-size: 1rem; background: rgba(0,255,0,0.1); border-color: #00ff00;"></div>
+                </div>
+                <div class="phase-title">
+                    <h3>PICK YOUR TARGET!</h3>
+                </div>
+                <div class="route-legend" style="margin-bottom: 10px;">
+                    <div class="legend-item"><span class="legend-color deep"></span> Deep</div>
+                    <div class="legend-item"><span class="legend-color cross"></span> Cross</div>
+                    <div class="legend-item"><span class="legend-color short"></span> Short</div>
+                    <div class="legend-item"><span class="legend-color other"></span> Medium</div>
+                </div>
+                <div class="field-diagram" id="fieldDiagram">
+                    <svg class="route-overlay" id="routeOverlay" viewBox="0 0 100 100" preserveAspectRatio="none"></svg>
+                    <div class="field-lines"></div>
+                    <div class="qb-marker">QB</div>
+                    <!-- Receivers added dynamically -->
+                </div>
+            </div>
+
+            <!-- Result Screen -->
+            <div class="phase-screen" id="resultScreen">
+                <div class="result-screen">
+                    <div class="result-text" id="resultText">BIG PLAY!</div>
+                    <div class="result-yards" id="resultYards">+25 YARDS</div>
+                    <div class="result-detail" id="resultDetail">Perfect read! The seam was wide open!</div>
+                    <button class="next-btn" onclick="nextPlay()">NEXT PLAY</button>
+                </div>
+            </div>
+
+            <!-- Game Over Screen -->
+            <div class="phase-screen" id="gameOverScreen">
+                <div class="game-over">
+                    <h2 id="gameOverTitle">TOUCHDOWN!</h2>
+                    <div class="final-score" id="finalScore">6</div>
+                    <div class="stats" id="gameStats">
+                        Perfect Reads: 2 | Good Reads: 1 | Bad Reads: 1
+                    </div>
+                    <button class="play-again-btn" onclick="startGame()">PLAY AGAIN</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Game State
+        let gameState = {
+            score: 0,
+            down: 1,
+            yardsToGo: 40,
+            ballPosition: 40, // yards from end zone
+            timer: 15,
+            timerInterval: null,
+            currentDefense: null,
+            currentFormation: null,
+            currentPlay: null,
+            perfectReads: 0,
+            goodReads: 0,
+            badReads: 0
+        };
+
+        // Game Data
+        const defenses = [
+            { formation: '4-3', coverage: 'cover_3', name: '4-3 COVER 3' },
+            { formation: 'nickel', coverage: 'cover_3', name: 'NICKEL COVER 3' },
+            { formation: 'nickel', coverage: 'cover_2', name: 'NICKEL COVER 2' },
+            { formation: 'nickel', coverage: 'cover_1', name: 'NICKEL COVER 1' },
+            { formation: 'nickel', coverage: 'cover_4', name: 'NICKEL COVER 4' },
+            { formation: 'dime', coverage: 'cover_2', name: 'DIME COVER 2' },
+            { formation: 'dime', coverage: 'cover_3', name: 'DIME COVER 3' },
+            { formation: '4-3', coverage: 'cover_1', name: '4-3 COVER 1' },
+            { formation: '4-3', coverage: 'cover_2', name: '4-3 COVER 2' },
+            { formation: '3-4', coverage: 'cover_3', name: '3-4 COVER 3' }
+        ];
+
+        const formations = {
+            singleback: {
+                name: 'SINGLEBACK',
+                desc: '1 RB, 1 TE, 3 WR',
+                // Base positions for this formation (percentages)
+                basePositions: {
+                    X: { x: 8, y: 75 },    // Split end left
+                    SLOT: { x: 28, y: 75 }, // Slot left
+                    Y: { x: 62, y: 75 },   // TE right
+                    Z: { x: 92, y: 75 },   // Flanker right
+                    RB: { x: 50, y: 85 },  // Running back
+                    QB: { x: 50, y: 95 }   // Quarterback
+                },
+                plays: {
+                    pa_crossers: { name: 'PA CROSSERS', type: 'PASS' },
+                    curl_flat: { name: 'CURL FLAT', type: 'PASS' },
+                    slant_flat: { name: 'SLANT FLAT', type: 'PASS' },
+                    hb_dive: { name: 'HB DIVE', type: 'RUN' },
+                    stretch: { name: 'STRETCH', type: 'RUN' }
+                },
+                routes: {
+                    pa_crossers: [
+                        { pos: 'X', route: 'Deep Cross', path: [{x: 8, y: 75}, {x: 8, y: 50}, {x: 70, y: 30}] },
+                        { pos: 'SLOT', route: 'Shallow', path: [{x: 28, y: 75}, {x: 28, y: 60}, {x: 65, y: 55}] },
+                        { pos: 'Y', route: 'Drag', path: [{x: 62, y: 75}, {x: 62, y: 65}, {x: 30, y: 60}] },
+                        { pos: 'Z', route: 'Post', path: [{x: 92, y: 75}, {x: 92, y: 45}, {x: 65, y: 15}] },
+                        { pos: 'RB', route: 'Flat', path: [{x: 50, y: 85}, {x: 25, y: 75}] }
+                    ],
+                    curl_flat: [
+                        { pos: 'X', route: 'Curl', path: [{x: 8, y: 75}, {x: 8, y: 40}, {x: 15, y: 45}] },
+                        { pos: 'SLOT', route: 'Out', path: [{x: 28, y: 75}, {x: 28, y: 55}, {x: 10, y: 55}] },
+                        { pos: 'Y', route: 'Flat', path: [{x: 62, y: 75}, {x: 80, y: 70}] },
+                        { pos: 'Z', route: 'Comeback', path: [{x: 92, y: 75}, {x: 92, y: 35}, {x: 85, y: 45}] },
+                        { pos: 'RB', route: 'Check', path: [{x: 50, y: 85}, {x: 65, y: 75}] }
+                    ],
+                    slant_flat: [
+                        { pos: 'X', route: 'Slant', path: [{x: 8, y: 75}, {x: 35, y: 50}] },
+                        { pos: 'SLOT', route: 'Flat', path: [{x: 28, y: 75}, {x: 12, y: 70}] },
+                        { pos: 'Y', route: 'Seam', path: [{x: 62, y: 75}, {x: 62, y: 25}] },
+                        { pos: 'Z', route: 'Go', path: [{x: 92, y: 75}, {x: 92, y: 15}] },
+                        { pos: 'RB', route: 'Swing', path: [{x: 50, y: 85}, {x: 75, y: 70}] }
+                    ]
+                },
+                receivers: {
+                    pa_crossers: [
+                        { name: 'X', route: 'Deep Cross', x: 70, y: 20, depth: 18 },
+                        { name: 'SLOT', route: 'Shallow', x: 60, y: 45, depth: 8 },
+                        { name: 'Y', route: 'Drag', x: 25, y: 50, depth: 5 },
+                        { name: 'Z', route: 'Post', x: 65, y: 10, depth: 20 },
+                        { name: 'RB', route: 'Flat', x: 20, y: 65, depth: 2 }
+                    ],
+                    curl_flat: [
+                        { name: 'X', route: 'Curl', x: 12, y: 35, depth: 12 },
+                        { name: 'SLOT', route: 'Out', x: 8, y: 45, depth: 8 },
+                        { name: 'Y', route: 'Flat', x: 82, y: 60, depth: 3 },
+                        { name: 'Z', route: 'Comeback', x: 88, y: 35, depth: 15 },
+                        { name: 'RB', route: 'Check', x: 68, y: 65, depth: 4 }
+                    ],
+                    slant_flat: [
+                        { name: 'X', route: 'Slant', x: 35, y: 40, depth: 8 },
+                        { name: 'SLOT', route: 'Flat', x: 10, y: 60, depth: 2 },
+                        { name: 'Y', route: 'Seam', x: 62, y: 15, depth: 20 },
+                        { name: 'Z', route: 'Go', x: 92, y: 10, depth: 25 },
+                        { name: 'RB', route: 'Swing', x: 78, y: 60, depth: 3 }
+                    ]
+                }
+            },
+            iform: {
+                name: 'I-FORM',
+                desc: '1 FB, 1 HB, 1 TE, 2 WR',
+                basePositions: {
+                    X: { x: 8, y: 75 },
+                    Y: { x: 70, y: 75 },
+                    Z: { x: 92, y: 75 },
+                    FB: { x: 50, y: 82 },
+                    HB: { x: 50, y: 90 },
+                    QB: { x: 50, y: 95 }
+                },
+                plays: {
+                    pa_boot: { name: 'PA BOOT', type: 'PASS' },
+                    levels: { name: 'LEVELS', type: 'PASS' },
+                    hb_toss: { name: 'HB TOSS', type: 'PASS' },
+                    power: { name: 'POWER O', type: 'RUN' },
+                    iso: { name: 'ISO', type: 'RUN' }
+                },
+                routes: {
+                    pa_boot: [
+                        { pos: 'X', route: 'Go', path: [{x: 8, y: 75}, {x: 8, y: 15}] },
+                        { pos: 'Y', route: 'Corner', path: [{x: 70, y: 75}, {x: 70, y: 50}, {x: 88, y: 25}] },
+                        { pos: 'Z', route: 'Drag', path: [{x: 92, y: 75}, {x: 92, y: 65}, {x: 35, y: 55}] },
+                        { pos: 'FB', route: 'Flat', path: [{x: 50, y: 82}, {x: 25, y: 70}] }
+                    ],
+                    levels: [
+                        { pos: 'X', route: 'Dig', path: [{x: 8, y: 75}, {x: 8, y: 40}, {x: 50, y: 40}] },
+                        { pos: 'Y', route: 'Shallow', path: [{x: 70, y: 75}, {x: 70, y: 60}, {x: 35, y: 55}] },
+                        { pos: 'Z', route: 'Curl', path: [{x: 92, y: 75}, {x: 92, y: 45}, {x: 85, y: 50}] },
+                        { pos: 'HB', route: 'Swing', path: [{x: 50, y: 90}, {x: 20, y: 75}] }
+                    ],
+                    hb_toss: [
+                        { pos: 'X', route: 'Post', path: [{x: 8, y: 75}, {x: 8, y: 45}, {x: 40, y: 20}] },
+                        { pos: 'Y', route: 'Flat', path: [{x: 70, y: 75}, {x: 85, y: 65}] },
+                        { pos: 'Z', route: 'Slant', path: [{x: 92, y: 75}, {x: 70, y: 55}] },
+                        { pos: 'HB', route: 'Wheel', path: [{x: 50, y: 90}, {x: 85, y: 80}, {x: 90, y: 25}] }
+                    ]
+                },
+                receivers: {
+                    pa_boot: [
+                        { name: 'X', route: 'Go', x: 8, y: 10, depth: 25 },
+                        { name: 'Y', route: 'Corner', x: 88, y: 18, depth: 15 },
+                        { name: 'Z', route: 'Drag', x: 30, y: 45, depth: 6 },
+                        { name: 'FB', route: 'Flat', x: 20, y: 60, depth: 3 }
+                    ],
+                    levels: [
+                        { name: 'X', route: 'Dig', x: 50, y: 30, depth: 15 },
+                        { name: 'Y', route: 'Shallow', x: 30, y: 45, depth: 5 },
+                        { name: 'Z', route: 'Curl', x: 88, y: 40, depth: 12 },
+                        { name: 'HB', route: 'Swing', x: 15, y: 65, depth: 2 }
+                    ],
+                    hb_toss: [
+                        { name: 'X', route: 'Post', x: 40, y: 15, depth: 18 },
+                        { name: 'Y', route: 'Flat', x: 88, y: 55, depth: 3 },
+                        { name: 'Z', route: 'Slant', x: 70, y: 45, depth: 8 },
+                        { name: 'HB', route: 'Wheel', x: 92, y: 18, depth: 22 }
+                    ]
+                }
+            },
+            shotgun_3wr: {
+                name: 'GUN 3WR',
+                desc: '1 RB, 1 TE, 3 WR - Gun',
+                basePositions: {
+                    X: { x: 8, y: 75 },
+                    SLOT: { x: 28, y: 75 },
+                    Y: { x: 65, y: 75 },
+                    Z: { x: 92, y: 75 },
+                    RB: { x: 40, y: 88 },
+                    QB: { x: 50, y: 88 }
+                },
+                plays: {
+                    mesh: { name: 'MESH', type: 'PASS' },
+                    four_verts: { name: '4 VERTS', type: 'PASS' },
+                    rpo: { name: 'RPO SLANT', type: 'RPO' },
+                    spot: { name: 'SPOT', type: 'PASS' },
+                    draw: { name: 'DRAW', type: 'RUN' }
+                },
+                routes: {
+                    mesh: [
+                        { pos: 'X', route: 'Cross', path: [{x: 8, y: 75}, {x: 8, y: 60}, {x: 70, y: 55}] },
+                        { pos: 'SLOT', route: 'Corner', path: [{x: 28, y: 75}, {x: 28, y: 50}, {x: 10, y: 25}] },
+                        { pos: 'Y', route: 'Sit', path: [{x: 65, y: 75}, {x: 65, y: 50}] },
+                        { pos: 'Z', route: 'Cross', path: [{x: 92, y: 75}, {x: 92, y: 60}, {x: 30, y: 55}] },
+                        { pos: 'RB', route: 'Angle', path: [{x: 40, y: 88}, {x: 55, y: 75}, {x: 55, y: 55}] }
+                    ],
+                    four_verts: [
+                        { pos: 'X', route: 'Go', path: [{x: 8, y: 75}, {x: 8, y: 15}] },
+                        { pos: 'SLOT', route: 'Seam', path: [{x: 28, y: 75}, {x: 35, y: 20}] },
+                        { pos: 'Y', route: 'Seam', path: [{x: 65, y: 75}, {x: 65, y: 20}] },
+                        { pos: 'Z', route: 'Go', path: [{x: 92, y: 75}, {x: 92, y: 15}] }
+                    ],
+                    rpo: [
+                        { pos: 'X', route: 'Slant', path: [{x: 8, y: 75}, {x: 35, y: 55}] },
+                        { pos: 'SLOT', route: 'Bubble', path: [{x: 28, y: 75}, {x: 15, y: 70}] },
+                        { pos: 'Z', route: 'Slant', path: [{x: 92, y: 75}, {x: 68, y: 55}] }
+                    ],
+                    spot: [
+                        { pos: 'X', route: 'Curl', path: [{x: 8, y: 75}, {x: 8, y: 45}, {x: 15, y: 50}] },
+                        { pos: 'SLOT', route: 'Flat', path: [{x: 28, y: 75}, {x: 12, y: 70}] },
+                        { pos: 'Y', route: 'Sit', path: [{x: 65, y: 75}, {x: 65, y: 55}] },
+                        { pos: 'Z', route: 'Corner', path: [{x: 92, y: 75}, {x: 92, y: 50}, {x: 98, y: 25}] },
+                        { pos: 'RB', route: 'Angle', path: [{x: 40, y: 88}, {x: 55, y: 75}, {x: 55, y: 55}] }
+                    ]
+                },
+                receivers: {
+                    mesh: [
+                        { name: 'X', route: 'Cross', x: 72, y: 45, depth: 6 },
+                        { name: 'SLOT', route: 'Corner', x: 8, y: 18, depth: 15 },
+                        { name: 'Y', route: 'Sit', x: 65, y: 40, depth: 10 },
+                        { name: 'Z', route: 'Cross', x: 28, y: 45, depth: 6 },
+                        { name: 'RB', route: 'Angle', x: 55, y: 45, depth: 5 }
+                    ],
+                    four_verts: [
+                        { name: 'X', route: 'Go', x: 8, y: 10, depth: 25 },
+                        { name: 'SLOT', route: 'Seam', x: 35, y: 12, depth: 20 },
+                        { name: 'Y', route: 'Seam', x: 65, y: 12, depth: 20 },
+                        { name: 'Z', route: 'Go', x: 92, y: 10, depth: 25 }
+                    ],
+                    rpo: [
+                        { name: 'X', route: 'Slant', x: 35, y: 45, depth: 8 },
+                        { name: 'SLOT', route: 'Bubble', x: 12, y: 60, depth: 1 },
+                        { name: 'Z', route: 'Slant', x: 68, y: 45, depth: 8 }
+                    ],
+                    spot: [
+                        { name: 'X', route: 'Curl', x: 15, y: 40, depth: 12 },
+                        { name: 'SLOT', route: 'Flat', x: 10, y: 60, depth: 2 },
+                        { name: 'Y', route: 'Sit', x: 65, y: 45, depth: 8 },
+                        { name: 'Z', route: 'Corner', x: 95, y: 18, depth: 15 },
+                        { name: 'RB', route: 'Angle', x: 55, y: 45, depth: 5 }
+                    ]
+                }
+            },
+            shotgun_4wr: {
+                name: 'GUN 4WR',
+                desc: '1 RB, 4 WR - Spread',
+                basePositions: {
+                    X: { x: 5, y: 75 },
+                    SL: { x: 25, y: 75 },
+                    SR: { x: 75, y: 75 },
+                    Z: { x: 95, y: 75 },
+                    RB: { x: 40, y: 88 },
+                    QB: { x: 50, y: 88 }
+                },
+                plays: {
+                    spacing: { name: 'SPACING', type: 'PASS' },
+                    smash: { name: 'SMASH', type: 'PASS' },
+                    flood: { name: 'FLOOD', type: 'PASS' },
+                    mesh_cross: { name: 'MESH', type: 'PASS' },
+                    screen: { name: 'WR SCREEN', type: 'PASS' }
+                },
+                routes: {
+                    spacing: [
+                        { pos: 'X', route: 'Hitch', path: [{x: 5, y: 75}, {x: 5, y: 55}] },
+                        { pos: 'SL', route: 'Flat', path: [{x: 25, y: 75}, {x: 10, y: 70}] },
+                        { pos: 'SR', route: 'Sit', path: [{x: 75, y: 75}, {x: 75, y: 50}] },
+                        { pos: 'Z', route: 'Out', path: [{x: 95, y: 75}, {x: 95, y: 55}, {x: 100, y: 55}] },
+                        { pos: 'RB', route: 'Swing', path: [{x: 40, y: 88}, {x: 65, y: 70}] }
+                    ],
+                    smash: [
+                        { pos: 'X', route: 'Hitch', path: [{x: 5, y: 75}, {x: 5, y: 55}] },
+                        { pos: 'SL', route: 'Corner', path: [{x: 25, y: 75}, {x: 25, y: 50}, {x: 8, y: 25}] },
+                        { pos: 'SR', route: 'Corner', path: [{x: 75, y: 75}, {x: 75, y: 50}, {x: 92, y: 25}] },
+                        { pos: 'Z', route: 'Hitch', path: [{x: 95, y: 75}, {x: 95, y: 55}] }
+                    ],
+                    flood: [
+                        { pos: 'X', route: 'Go', path: [{x: 5, y: 75}, {x: 5, y: 15}] },
+                        { pos: 'SL', route: 'Dig', path: [{x: 25, y: 75}, {x: 25, y: 45}, {x: 55, y: 45}] },
+                        { pos: 'SR', route: 'Out', path: [{x: 75, y: 75}, {x: 75, y: 55}, {x: 95, y: 55}] },
+                        { pos: 'Z', route: 'Flat', path: [{x: 95, y: 75}, {x: 100, y: 70}] },
+                        { pos: 'RB', route: 'Wheel', path: [{x: 40, y: 88}, {x: 85, y: 75}, {x: 90, y: 25}] }
+                    ],
+                    mesh_cross: [
+                        { pos: 'X', route: 'Cross', path: [{x: 5, y: 75}, {x: 5, y: 60}, {x: 70, y: 55}] },
+                        { pos: 'SL', route: 'Corner', path: [{x: 25, y: 75}, {x: 25, y: 50}, {x: 8, y: 25}] },
+                        { pos: 'SR', route: 'Sit', path: [{x: 75, y: 75}, {x: 75, y: 50}] },
+                        { pos: 'Z', route: 'Cross', path: [{x: 95, y: 75}, {x: 95, y: 60}, {x: 30, y: 55}] },
+                        { pos: 'RB', route: 'Angle', path: [{x: 40, y: 88}, {x: 55, y: 75}, {x: 55, y: 50}] }
+                    ],
+                    screen: [
+                        { pos: 'X', route: 'Block', path: [{x: 5, y: 75}, {x: 15, y: 70}] },
+                        { pos: 'SL', route: 'Screen', path: [{x: 25, y: 75}, {x: 15, y: 72}] },
+                        { pos: 'SR', route: 'Block', path: [{x: 75, y: 75}, {x: 65, y: 70}] },
+                        { pos: 'Z', route: 'Go', path: [{x: 95, y: 75}, {x: 95, y: 20}] }
+                    ]
+                },
+                receivers: {
+                    spacing: [
+                        { name: 'X', route: 'Hitch', x: 5, y: 45, depth: 6 },
+                        { name: 'SL', route: 'Flat', x: 8, y: 60, depth: 2 },
+                        { name: 'SR', route: 'Sit', x: 75, y: 40, depth: 10 },
+                        { name: 'Z', route: 'Out', x: 95, y: 45, depth: 5 },
+                        { name: 'RB', route: 'Swing', x: 68, y: 60, depth: 3 }
+                    ],
+                    smash: [
+                        { name: 'X', route: 'Hitch', x: 5, y: 45, depth: 6 },
+                        { name: 'SL', route: 'Corner', x: 6, y: 18, depth: 15 },
+                        { name: 'SR', route: 'Corner', x: 94, y: 18, depth: 15 },
+                        { name: 'Z', route: 'Hitch', x: 95, y: 45, depth: 6 }
+                    ],
+                    flood: [
+                        { name: 'X', route: 'Go', x: 5, y: 10, depth: 25 },
+                        { name: 'SL', route: 'Dig', x: 55, y: 35, depth: 12 },
+                        { name: 'SR', route: 'Out', x: 95, y: 45, depth: 8 },
+                        { name: 'Z', route: 'Flat', x: 98, y: 60, depth: 2 },
+                        { name: 'RB', route: 'Wheel', x: 92, y: 18, depth: 18 }
+                    ],
+                    mesh_cross: [
+                        { name: 'X', route: 'Cross', x: 72, y: 45, depth: 6 },
+                        { name: 'SL', route: 'Corner', x: 6, y: 18, depth: 15 },
+                        { name: 'SR', route: 'Sit', x: 75, y: 40, depth: 10 },
+                        { name: 'Z', route: 'Cross', x: 28, y: 45, depth: 6 },
+                        { name: 'RB', route: 'Angle', x: 55, y: 40, depth: 5 }
+                    ],
+                    screen: [
+                        { name: 'SL', route: 'Screen', x: 12, y: 62, depth: 0 },
+                        { name: 'Z', route: 'Go', x: 95, y: 12, depth: 20 }
+                    ]
+                }
+            }
+        };
+
+        // Generate SVG play diagram
+        function generatePlayDiagram(formationKey, playKey) {
+            const formation = formations[formationKey];
+            const routes = formation.routes[playKey];
+            const play = formation.plays[playKey];
+            const basePos = formation.basePositions;
+
+            // If run play, show run diagram
+            if (play.type === 'RUN') {
+                return generateRunDiagram(formationKey);
+            }
+
+            let svg = `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">`;
+
+            // Field background
+            svg += `<rect x="0" y="0" width="100" height="100" fill="#1a3a1a"/>`;
+
+            // Line of scrimmage
+            svg += `<line x1="0" y1="72" x2="100" y2="72" stroke="rgba(255,255,255,0.4)" stroke-width="0.5"/>`;
+
+            // Draw route lines first (so players are on top)
+            if (routes) {
+                routes.forEach(route => {
+                    const path = route.path;
+                    if (path.length >= 2) {
+                        let pathD = `M ${path[0].x} ${path[0].y}`;
+                        for (let i = 1; i < path.length; i++) {
+                            pathD += ` L ${path[i].x} ${path[i].y}`;
+                        }
+                        // Different colors for different route types
+                        let color = '#00bfff'; // Default blue
+                        if (route.route.includes('Go') || route.route.includes('Post') || route.route.includes('Seam')) {
+                            color = '#ff4444'; // Deep routes in red
+                        } else if (route.route.includes('Flat') || route.route.includes('Swing') || route.route.includes('Screen')) {
+                            color = '#ffff00'; // Short routes in yellow
+                        } else if (route.route.includes('Cross') || route.route.includes('Drag') || route.route.includes('Shallow')) {
+                            color = '#00ff00'; // Crossing routes in green
+                        }
+                        svg += `<path d="${pathD}" fill="none" stroke="${color}" stroke-width="2" stroke-linecap="round"/>`;
+
+                        // Arrow at end
+                        const lastPt = path[path.length - 1];
+                        const prevPt = path[path.length - 2];
+                        const angle = Math.atan2(lastPt.y - prevPt.y, lastPt.x - prevPt.x);
+                        const arrowSize = 4;
+                        svg += `<polygon points="${lastPt.x},${lastPt.y} ${lastPt.x - arrowSize * Math.cos(angle - 0.5)},${lastPt.y - arrowSize * Math.sin(angle - 0.5)} ${lastPt.x - arrowSize * Math.cos(angle + 0.5)},${lastPt.y - arrowSize * Math.sin(angle + 0.5)}" fill="${color}"/>`;
+                    }
+                });
+            }
+
+            // Draw O-line (small squares)
+            const lineY = 75;
+            const linePositions = [40, 45, 50, 55, 60];
+            linePositions.forEach(x => {
+                svg += `<rect x="${x-2}" y="${lineY-2}" width="4" height="4" fill="#4a90d9" stroke="white" stroke-width="0.5"/>`;
+            });
+
+            // Draw QB
+            if (basePos.QB) {
+                svg += `<circle cx="${basePos.QB.x}" cy="${basePos.QB.y}" r="3.5" fill="#ffd700" stroke="white" stroke-width="0.8"/>`;
+            }
+
+            // Draw receivers at base positions
+            Object.entries(basePos).forEach(([pos, coords]) => {
+                if (pos === 'QB') return;
+                let color = '#00aaff'; // Receivers blue
+                if (pos === 'RB' || pos === 'HB' || pos === 'FB') {
+                    color = '#32cd32'; // Backs green
+                }
+                svg += `<circle cx="${coords.x}" cy="${coords.y}" r="3" fill="${color}" stroke="white" stroke-width="0.8"/>`;
+            });
+
+            svg += `</svg>`;
+            return svg;
+        }
+
+        // Generate run play diagram
+        function generateRunDiagram(formationKey) {
+            const formation = formations[formationKey];
+            const basePos = formation.basePositions;
+
+            let svg = `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">`;
+            svg += `<rect x="0" y="0" width="100" height="100" fill="#1a3a1a"/>`;
+            svg += `<line x1="0" y1="72" x2="100" y2="72" stroke="rgba(255,255,255,0.4)" stroke-width="0.5"/>`;
+
+            // O-line with blocking arrows
+            const lineY = 75;
+            const linePositions = [40, 45, 50, 55, 60];
+            linePositions.forEach((x, i) => {
+                svg += `<rect x="${x-2}" y="${lineY-2}" width="4" height="4" fill="#4a90d9" stroke="white" stroke-width="0.5"/>`;
+                // Blocking arrows
+                if (i < 2) {
+                    svg += `<line x1="${x}" y1="${lineY-5}" x2="${x-3}" y2="${lineY-15}" stroke="#ffaa00" stroke-width="2"/>`;
+                } else if (i > 2) {
+                    svg += `<line x1="${x}" y1="${lineY-5}" x2="${x+3}" y2="${lineY-15}" stroke="#ffaa00" stroke-width="2"/>`;
+                } else {
+                    svg += `<line x1="${x}" y1="${lineY-5}" x2="${x}" y2="${lineY-15}" stroke="#ffaa00" stroke-width="2"/>`;
+                }
+            });
+
+            // QB
+            if (basePos.QB) {
+                svg += `<circle cx="${basePos.QB.x}" cy="${basePos.QB.y}" r="3.5" fill="#ffd700" stroke="white" stroke-width="0.8"/>`;
+            }
+
+            // Draw RB/HB with run path
+            const rbPos = basePos.RB || basePos.HB;
+            if (rbPos) {
+                svg += `<circle cx="${rbPos.x}" cy="${rbPos.y}" r="3" fill="#32cd32" stroke="white" stroke-width="0.8"/>`;
+                // Run path arrow
+                svg += `<path d="M ${rbPos.x} ${rbPos.y - 5} L ${rbPos.x} ${rbPos.y - 30}" fill="none" stroke="#ff4444" stroke-width="3" stroke-linecap="round"/>`;
+                svg += `<polygon points="${rbPos.x},${rbPos.y - 35} ${rbPos.x - 4},${rbPos.y - 28} ${rbPos.x + 4},${rbPos.y - 28}" fill="#ff4444"/>`;
+            }
+
+            // Other players at base positions
+            Object.entries(basePos).forEach(([pos, coords]) => {
+                if (pos === 'QB' || pos === 'RB' || pos === 'HB') return;
+                let color = '#00aaff';
+                if (pos === 'FB') color = '#32cd32';
+                svg += `<circle cx="${coords.x}" cy="${coords.y}" r="3" fill="${color}" stroke="white" stroke-width="0.8"/>`;
+            });
+
+            svg += `</svg>`;
+            return svg;
+        }
+
+        // Coverage matchups - what routes work against each coverage
+        const coverageMatchups = {
+            cover_1: {
+                perfect: ['Cross', 'Shallow', 'Dig', 'Drag', 'Post'],
+                good: ['Corner', 'Seam', 'Out', 'Slant'],
+                bad: ['Go', 'Hitch', 'Curl', 'Comeback']
+            },
+            cover_2: {
+                perfect: ['Seam', 'Post', 'Corner', 'Dig'],
+                good: ['Curl', 'Out', 'Sit'],
+                bad: ['Go', 'Flat', 'Hitch', 'Shallow']
+            },
+            cover_3: {
+                perfect: ['Seam', 'Curl', 'Flat', 'Shallow', 'Cross'],
+                good: ['Dig', 'Out', 'Corner', 'Sit'],
+                bad: ['Go', 'Post', 'Hitch']
+            },
+            cover_4: {
+                perfect: ['Flat', 'Curl', 'Hitch', 'Out', 'Shallow'],
+                good: ['Drag', 'Cross', 'Sit', 'Slant'],
+                bad: ['Go', 'Seam', 'Post', 'Corner']
+            },
+            cover_0: {
+                perfect: ['Slant', 'Go', 'Post', 'Cross'],
+                good: ['Dig', 'Corner', 'Out'],
+                bad: ['Curl', 'Hitch', 'Sit', 'Comeback']
+            }
+        };
+
+        function startGame() {
+            // Reset game state
+            gameState = {
+                score: 0,
+                down: 1,
+                yardsToGo: 40,
+                ballPosition: 40,
+                timer: 15,
+                timerInterval: null,
+                currentDefense: null,
+                currentFormation: null,
+                currentPlay: null,
+                perfectReads: 0,
+                goodReads: 0,
+                badReads: 0
+            };
+
+            updateDisplay();
+            startPlay();
+        }
+
+        function startPlay() {
+            // Pick random defense
+            gameState.currentDefense = defenses[Math.floor(Math.random() * defenses.length)];
+
+            // Show defense screen
+            showScreen('defenseScreen');
+            document.getElementById('defenseName').textContent = gameState.currentDefense.name;
+
+            // Generate formation buttons
+            generateFormationButtons();
+
+            // Start timer
+            startTimer(15, onFormationTimeout);
+        }
+
+        function generateFormationButtons() {
+            const grid = document.getElementById('formationGrid');
+            grid.innerHTML = '';
+
+            Object.entries(formations).forEach(([key, formation]) => {
+                const btn = document.createElement('button');
+                btn.className = 'formation-btn';
+                btn.innerHTML = `${formation.name}<div class="desc">${formation.desc}</div>`;
+                btn.onclick = () => selectFormation(key);
+                grid.appendChild(btn);
+            });
+        }
+
+        function selectFormation(formationKey) {
+            clearTimer();
+            gameState.currentFormation = formationKey;
+
+            // Show play selection
+            showScreen('playScreen');
+            document.getElementById('defenseNamePlay').textContent = gameState.currentDefense.name;
+
+            // Generate play buttons
+            generatePlayButtons(formationKey);
+
+            // Start timer
+            startTimer(15, onPlayTimeout);
+        }
+
+        function generatePlayButtons(formationKey) {
+            const grid = document.getElementById('playGrid');
+            grid.innerHTML = '';
+
+            const formation = formations[formationKey];
+            Object.entries(formation.plays).forEach(([key, play]) => {
+                const btn = document.createElement('button');
+                btn.className = 'play-btn';
+
+                // Generate the play diagram SVG
+                const diagram = generatePlayDiagram(formationKey, key);
+
+                btn.innerHTML = `
+                    <div class="play-diagram">${diagram}</div>
+                    <div class="play-name">${play.name}</div>
+                    <div class="type">${play.type}</div>
+                `;
+                btn.onclick = () => selectPlay(key);
+                grid.appendChild(btn);
+            });
+        }
+
+        function selectPlay(playKey) {
+            clearTimer();
+            gameState.currentPlay = playKey;
+
+            const formation = formations[gameState.currentFormation];
+            const play = formation.plays[playKey];
+
+            // Check if it's a run play
+            if (play.type === 'RUN') {
+                // Run plays resolve immediately
+                resolveRunPlay();
+                return;
+            }
+
+            // Show receiver selection
+            showScreen('receiverScreen');
+            document.getElementById('playCallName').textContent = play.name;
+
+            // Generate receiver buttons on field
+            generateReceiverButtons();
+
+            // Start timer
+            startTimer(15, onReceiverTimeout);
+        }
+
+        function generateReceiverButtons() {
+            const field = document.getElementById('fieldDiagram');
+            const routeOverlay = document.getElementById('routeOverlay');
+
+            // Remove old receiver buttons
+            field.querySelectorAll('.receiver-btn').forEach(btn => btn.remove());
+
+            const formation = formations[gameState.currentFormation];
+            const receivers = formation.receivers[gameState.currentPlay];
+            const routes = formation.routes[gameState.currentPlay];
+
+            if (!receivers) return;
+
+            // Draw route lines on the SVG overlay
+            let svgContent = '';
+
+            // Add yard line markers
+            svgContent += `<line x1="0" y1="25" x2="100" y2="25" stroke="rgba(255,255,255,0.2)" stroke-width="0.5"/>`;
+            svgContent += `<line x1="0" y1="50" x2="100" y2="50" stroke="rgba(255,255,255,0.2)" stroke-width="0.5"/>`;
+            svgContent += `<line x1="0" y1="75" x2="100" y2="75" stroke="rgba(255,255,255,0.3)" stroke-width="0.8"/>`;
+
+            // Draw routes if available
+            if (routes) {
+                routes.forEach(route => {
+                    const path = route.path;
+                    if (path && path.length >= 2) {
+                        // Build path string
+                        let pathD = `M ${path[0].x} ${path[0].y}`;
+                        for (let i = 1; i < path.length; i++) {
+                            pathD += ` L ${path[i].x} ${path[i].y}`;
+                        }
+
+                        // Color based on route type
+                        let color = '#00bfff'; // Default blue for medium
+                        if (route.route.includes('Go') || route.route.includes('Post') || route.route.includes('Seam') || route.route.includes('Wheel') || route.route.includes('Corner')) {
+                            color = '#ff4444'; // Deep routes in red
+                        } else if (route.route.includes('Flat') || route.route.includes('Swing') || route.route.includes('Screen') || route.route.includes('Bubble') || route.route.includes('Check')) {
+                            color = '#ffff00'; // Short routes in yellow
+                        } else if (route.route.includes('Cross') || route.route.includes('Drag') || route.route.includes('Shallow')) {
+                            color = '#00ff00'; // Crossing routes in green
+                        }
+
+                        // Draw the route line
+                        svgContent += `<path d="${pathD}" fill="none" stroke="${color}" stroke-width="2.5" stroke-linecap="round" opacity="0.9"/>`;
+
+                        // Arrow at end
+                        const lastPt = path[path.length - 1];
+                        const prevPt = path[path.length - 2];
+                        const angle = Math.atan2(lastPt.y - prevPt.y, lastPt.x - prevPt.x);
+                        const arrowSize = 4;
+                        svgContent += `<polygon points="${lastPt.x},${lastPt.y} ${lastPt.x - arrowSize * Math.cos(angle - 0.5)},${lastPt.y - arrowSize * Math.sin(angle - 0.5)} ${lastPt.x - arrowSize * Math.cos(angle + 0.5)},${lastPt.y - arrowSize * Math.sin(angle + 0.5)}" fill="${color}"/>`;
+
+                        // Draw starting position circle (player's initial position)
+                        svgContent += `<circle cx="${path[0].x}" cy="${path[0].y}" r="2.5" fill="${color}" stroke="white" stroke-width="0.5"/>`;
+                    }
+                });
+            }
+
+            routeOverlay.innerHTML = svgContent;
+
+            // Add receiver buttons at their target positions
+            receivers.forEach(receiver => {
+                const btn = document.createElement('button');
+                btn.className = 'receiver-btn';
+                btn.innerHTML = `${receiver.name}<div class="route">${receiver.route}</div>`;
+                btn.style.left = `${receiver.x}%`;
+                btn.style.top = `${receiver.y}%`;
+                btn.style.transform = 'translate(-50%, -50%)';
+                btn.onclick = () => selectReceiver(receiver);
+                field.appendChild(btn);
+            });
+        }
+
+        function selectReceiver(receiver) {
+            clearTimer();
+            resolvePassPlay(receiver);
+        }
+
+        function resolvePassPlay(receiver) {
+            const coverage = gameState.currentDefense.coverage;
+            const matchup = coverageMatchups[coverage] || coverageMatchups.cover_3;
+
+            let result;
+            const route = receiver.route;
+
+            if (matchup.perfect.some(r => route.includes(r))) {
+                result = calculatePerfectRead(receiver.depth);
+                gameState.perfectReads++;
+            } else if (matchup.good.some(r => route.includes(r))) {
+                result = calculateGoodRead(receiver.depth);
+                gameState.goodReads++;
+            } else {
+                result = calculateBadRead();
+                gameState.badReads++;
+            }
+
+            showResult(result);
+        }
+
+        function resolveRunPlay() {
+            const coverage = gameState.currentDefense.coverage;
+            const formation = gameState.currentDefense.formation;
+
+            // Run effectiveness based on defense
+            let baseYards = Math.floor(Math.random() * 6) + 2; // 2-7 yards base
+
+            // Dime = good for run
+            if (formation === 'dime') {
+                baseYards += Math.floor(Math.random() * 5) + 3;
+            }
+            // Nickel = okay for run
+            else if (formation === 'nickel') {
+                baseYards += Math.floor(Math.random() * 3);
+            }
+            // 4-3/3-4 = tough for run
+            else {
+                baseYards -= Math.floor(Math.random() * 2);
+            }
+
+            baseYards = Math.max(baseYards, -2);
+
+            let result;
+            if (baseYards >= 8) {
+                result = { type: 'big-play', yards: baseYards, message: 'HUGE HOLE! Great blocking!', detail: 'The defense was spread thin!' };
+                gameState.goodReads++;
+            } else if (baseYards >= 4) {
+                result = { type: 'good-play', yards: baseYards, message: 'SOLID GAIN!', detail: 'Good downhill running!' };
+                gameState.goodReads++;
+            } else if (baseYards >= 0) {
+                result = { type: 'bad-play', yards: baseYards, message: 'STUFFED!', detail: 'The defense read it well.' };
+                gameState.badReads++;
+            } else {
+                result = { type: 'bad-play', yards: baseYards, message: 'LOSS!', detail: 'Hit in the backfield!' };
+                gameState.badReads++;
+            }
+
+            showResult(result);
+        }
+
+        function calculatePerfectRead(depth) {
+            const yards = Math.floor(Math.random() * 26) + 15; // 15-40 yards
+            return {
+                type: 'big-play',
+                yards: yards,
+                message: 'PERFECT READ!',
+                detail: 'Wide open! The coverage couldn\'t handle it!'
+            };
+        }
+
+        function calculateGoodRead(depth) {
+            const yards = Math.floor(Math.random() * 11) + 5; // 5-15 yards
+            return {
+                type: 'good-play',
+                yards: yards,
+                message: 'GOOD READ!',
+                detail: 'Found the soft spot in the zone!'
+            };
+        }
+
+        function calculateBadRead() {
+            const roll = Math.random();
+            if (roll < 0.3) {
+                return { type: 'turnover', yards: 0, message: 'INTERCEPTED!', detail: 'The defender was sitting on that route!', turnover: true };
+            } else if (roll < 0.6) {
+                return { type: 'bad-play', yards: -7, message: 'SACKED!', detail: 'Held the ball too long!' };
+            } else {
+                return { type: 'bad-play', yards: 0, message: 'INCOMPLETE!', detail: 'Tight coverage, nowhere to go.' };
+            }
+        }
+
+        function showResult(result) {
+            showScreen('resultScreen');
+
+            const resultText = document.getElementById('resultText');
+            const resultYards = document.getElementById('resultYards');
+            const resultDetail = document.getElementById('resultDetail');
+
+            resultText.textContent = result.message;
+            resultText.className = 'result-text ' + result.type;
+
+            if (result.yards > 0) {
+                resultYards.textContent = `+${result.yards} YARDS`;
+            } else if (result.yards < 0) {
+                resultYards.textContent = `${result.yards} YARDS`;
+            } else {
+                resultYards.textContent = result.turnover ? 'TURNOVER!' : '0 YARDS';
+            }
+
+            resultDetail.textContent = result.detail;
+
+            // Update game state
+            if (result.turnover) {
+                gameState.down = 5; // Force game over
+            } else {
+                gameState.ballPosition -= result.yards;
+                gameState.yardsToGo -= result.yards;
+
+                if (gameState.ballPosition <= 0) {
+                    // TOUCHDOWN!
+                    setTimeout(() => {
+                        gameState.score += 6;
+                        showGameOver('TOUCHDOWN!');
+                    }, 1500);
+                    return;
+                }
+
+                // Check for first down
+                if (gameState.yardsToGo <= 0) {
+                    gameState.down = 1;
+                    gameState.yardsToGo = Math.min(10, gameState.ballPosition);
+                } else {
+                    gameState.down++;
+                }
+            }
+
+            updateDisplay();
+        }
+
+        function nextPlay() {
+            if (gameState.down > 4 || gameState.ballPosition <= 0) {
+                if (gameState.ballPosition <= 0) {
+                    showGameOver('TOUCHDOWN!');
+                } else {
+                    showGameOver('TURNOVER ON DOWNS');
+                }
+            } else {
+                startPlay();
+            }
+        }
+
+        function showGameOver(title) {
+            showScreen('gameOverScreen');
+
+            document.getElementById('gameOverTitle').textContent = title;
+            document.getElementById('finalScore').textContent = gameState.score;
+            document.getElementById('gameStats').textContent =
+                `Perfect Reads: ${gameState.perfectReads} | Good Reads: ${gameState.goodReads} | Bad Reads: ${gameState.badReads}`;
+
+            if (title === 'TOUCHDOWN!') {
+                document.getElementById('gameOverTitle').style.color = '#00ff00';
+            } else {
+                document.getElementById('gameOverTitle').style.color = '#ff0000';
+            }
+        }
+
+        function showScreen(screenId) {
+            document.querySelectorAll('.phase-screen').forEach(screen => {
+                screen.classList.remove('active');
+            });
+            document.getElementById(screenId).classList.add('active');
+        }
+
+        function updateDisplay() {
+            const downs = ['1st', '2nd', '3rd', '4th'];
+            document.getElementById('score').textContent = gameState.score;
+            document.getElementById('down').textContent = downs[gameState.down - 1] || '4th';
+            document.getElementById('toGo').textContent = gameState.yardsToGo > 0 ? gameState.yardsToGo : 'GOAL';
+            document.getElementById('ballOn').textContent = gameState.ballPosition;
+        }
+
+        function startTimer(seconds, onTimeout) {
+            gameState.timer = seconds;
+            document.getElementById('timer').textContent = seconds;
+            document.getElementById('timerBox').classList.remove('warning');
+
+            gameState.timerInterval = setInterval(() => {
+                gameState.timer--;
+                document.getElementById('timer').textContent = gameState.timer;
+
+                if (gameState.timer <= 5) {
+                    document.getElementById('timerBox').classList.add('warning');
+                }
+
+                if (gameState.timer <= 0) {
+                    clearTimer();
+                    onTimeout();
+                }
+            }, 1000);
+        }
+
+        function clearTimer() {
+            if (gameState.timerInterval) {
+                clearInterval(gameState.timerInterval);
+                gameState.timerInterval = null;
+            }
+            document.getElementById('timerBox').classList.remove('warning');
+        }
+
+        function onFormationTimeout() {
+            // Random formation
+            const keys = Object.keys(formations);
+            selectFormation(keys[Math.floor(Math.random() * keys.length)]);
+        }
+
+        function onPlayTimeout() {
+            // Random play
+            const formation = formations[gameState.currentFormation];
+            const keys = Object.keys(formation.plays);
+            selectPlay(keys[Math.floor(Math.random() * keys.length)]);
+        }
+
+        function onReceiverTimeout() {
+            // Sack!
+            showResult({
+                type: 'bad-play',
+                yards: -8,
+                message: 'SACKED!',
+                detail: 'Time ran out! Gotta get rid of it!'
+            });
+        }
+    </script>
+</body>
+</html>

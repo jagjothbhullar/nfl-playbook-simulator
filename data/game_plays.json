@@ -1,0 +1,219 @@
+{
+  "formations": {
+    "singleback": {
+      "name": "Singleback",
+      "description": "1 RB, 1 TE, 3 WR",
+      "receivers": ["X (Split End)", "Y (TE)", "Z (Flanker)", "Slot", "RB"],
+      "plays": {
+        "pa_crossers": {
+          "name": "PA Crossers",
+          "type": "pass",
+          "routes": {
+            "X (Split End)": {"route": "Deep Cross", "depth": 18},
+            "Y (TE)": {"route": "Drag", "depth": 5},
+            "Z (Flanker)": {"route": "Post", "depth": 20},
+            "Slot": {"route": "Shallow Cross", "depth": 8},
+            "RB": {"route": "Flat", "depth": 2}
+          }
+        },
+        "curl_flat": {
+          "name": "Curl Flat",
+          "type": "pass",
+          "routes": {
+            "X (Split End)": {"route": "Curl", "depth": 12},
+            "Y (TE)": {"route": "Flat", "depth": 3},
+            "Z (Flanker)": {"route": "Comeback", "depth": 15},
+            "Slot": {"route": "Out", "depth": 8},
+            "RB": {"route": "Check Release", "depth": 4}
+          }
+        },
+        "hb_dive": {
+          "name": "HB Dive",
+          "type": "run",
+          "ball_carrier": "RB",
+          "gap": "A"
+        },
+        "stretch": {
+          "name": "Stretch",
+          "type": "run",
+          "ball_carrier": "RB",
+          "gap": "Outside"
+        }
+      }
+    },
+    "iform": {
+      "name": "I-Form",
+      "description": "1 FB, 1 HB, 1 TE, 2 WR",
+      "receivers": ["X (Split End)", "Y (TE)", "Z (Flanker)", "FB", "HB"],
+      "plays": {
+        "pa_boot": {
+          "name": "PA Boot",
+          "type": "pass",
+          "routes": {
+            "X (Split End)": {"route": "Go", "depth": 25},
+            "Y (TE)": {"route": "Corner", "depth": 15},
+            "Z (Flanker)": {"route": "Drag", "depth": 6},
+            "FB": {"route": "Flat", "depth": 3},
+            "HB": {"route": "Block", "depth": 0}
+          }
+        },
+        "levels": {
+          "name": "Levels",
+          "type": "pass",
+          "routes": {
+            "X (Split End)": {"route": "Dig", "depth": 15},
+            "Y (TE)": {"route": "Shallow", "depth": 5},
+            "Z (Flanker)": {"route": "Curl", "depth": 12},
+            "FB": {"route": "Check Release", "depth": 3},
+            "HB": {"route": "Swing", "depth": 2}
+          }
+        },
+        "power": {
+          "name": "Power O",
+          "type": "run",
+          "ball_carrier": "HB",
+          "gap": "B"
+        },
+        "iso": {
+          "name": "Iso",
+          "type": "run",
+          "ball_carrier": "HB",
+          "gap": "A"
+        }
+      }
+    },
+    "shotgun_3wr": {
+      "name": "Shotgun (3WR)",
+      "description": "1 RB, 1 TE, 3 WR - Gun",
+      "receivers": ["X (Split End)", "Y (TE)", "Z (Flanker)", "Slot", "RB"],
+      "plays": {
+        "mesh": {
+          "name": "Mesh",
+          "type": "pass",
+          "routes": {
+            "X (Split End)": {"route": "Shallow Cross", "depth": 6},
+            "Y (TE)": {"route": "Sit", "depth": 10},
+            "Z (Flanker)": {"route": "Shallow Cross", "depth": 6},
+            "Slot": {"route": "Corner", "depth": 15},
+            "RB": {"route": "Angle", "depth": 5}
+          }
+        },
+        "four_verts": {
+          "name": "Four Verticals",
+          "type": "pass",
+          "routes": {
+            "X (Split End)": {"route": "Go", "depth": 25},
+            "Y (TE)": {"route": "Seam", "depth": 20},
+            "Z (Flanker)": {"route": "Go", "depth": 25},
+            "Slot": {"route": "Seam", "depth": 20},
+            "RB": {"route": "Block", "depth": 0}
+          }
+        },
+        "draw": {
+          "name": "Draw",
+          "type": "run",
+          "ball_carrier": "RB",
+          "gap": "A"
+        },
+        "rpo_slant": {
+          "name": "RPO Slant",
+          "type": "rpo",
+          "routes": {
+            "X (Split End)": {"route": "Slant", "depth": 8},
+            "Slot": {"route": "Bubble", "depth": 1}
+          },
+          "ball_carrier": "RB"
+        }
+      }
+    },
+    "shotgun_4wr": {
+      "name": "Shotgun (4WR)",
+      "description": "1 RB, 4 WR - Empty look",
+      "receivers": ["X (Split End)", "Slot Left", "Slot Right", "Z (Flanker)", "RB"],
+      "plays": {
+        "spacing": {
+          "name": "Spacing",
+          "type": "pass",
+          "routes": {
+            "X (Split End)": {"route": "Hitch", "depth": 6},
+            "Slot Left": {"route": "Flat", "depth": 2},
+            "Slot Right": {"route": "Sit", "depth": 10},
+            "Z (Flanker)": {"route": "Speed Out", "depth": 5},
+            "RB": {"route": "Swing", "depth": 3}
+          }
+        },
+        "smash": {
+          "name": "Smash",
+          "type": "pass",
+          "routes": {
+            "X (Split End)": {"route": "Hitch", "depth": 6},
+            "Slot Left": {"route": "Corner", "depth": 15},
+            "Slot Right": {"route": "Corner", "depth": 15},
+            "Z (Flanker)": {"route": "Hitch", "depth": 6},
+            "RB": {"route": "Check Release", "depth": 4}
+          }
+        },
+        "flood": {
+          "name": "Flood",
+          "type": "pass",
+          "routes": {
+            "X (Split End)": {"route": "Go", "depth": 25},
+            "Slot Left": {"route": "Dig", "depth": 12},
+            "Slot Right": {"route": "Out", "depth": 10},
+            "Z (Flanker)": {"route": "Flat", "depth": 3},
+            "RB": {"route": "Wheel", "depth": 18}
+          }
+        },
+        "screen": {
+          "name": "WR Screen",
+          "type": "pass",
+          "routes": {
+            "X (Split End)": {"route": "Block", "depth": 0},
+            "Slot Left": {"route": "Screen", "depth": 0},
+            "Slot Right": {"route": "Block", "depth": 0},
+            "Z (Flanker)": {"route": "Go", "depth": 20},
+            "RB": {"route": "Block", "depth": 0}
+          }
+        }
+      }
+    }
+  },
+  "coverage_matchups": {
+    "cover_0": {
+      "perfect_reads": ["Shallow Cross", "Slant", "Quick Out", "Go"],
+      "good_reads": ["Dig", "Post", "Corner", "Drag"],
+      "bad_reads": ["Curl", "Comeback", "Hitch"],
+      "run_effectiveness": 0.3
+    },
+    "cover_1": {
+      "perfect_reads": ["Shallow Cross", "Dig", "Drag", "Post"],
+      "good_reads": ["Corner", "Seam", "Out"],
+      "bad_reads": ["Go", "Fade", "Hitch"],
+      "run_effectiveness": 0.5
+    },
+    "cover_2": {
+      "perfect_reads": ["Seam", "Post", "Corner"],
+      "good_reads": ["Dig", "Curl", "Out"],
+      "bad_reads": ["Go", "Fade", "Flat"],
+      "run_effectiveness": 0.6
+    },
+    "cover_3": {
+      "perfect_reads": ["Seam", "Curl", "Flat", "Shallow Cross"],
+      "good_reads": ["Dig", "Out", "Corner"],
+      "bad_reads": ["Go", "Post"],
+      "run_effectiveness": 0.4
+    },
+    "cover_4": {
+      "perfect_reads": ["Flat", "Curl", "Hitch", "Out"],
+      "good_reads": ["Drag", "Shallow Cross", "Sit"],
+      "bad_reads": ["Go", "Seam", "Post", "Corner"],
+      "run_effectiveness": 0.8
+    },
+    "nickel": {
+      "run_modifier": -0.15
+    },
+    "dime": {
+      "run_modifier": 0.25
+    }
+  }
+}

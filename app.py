@@ -18,6 +18,7 @@ def load_json(filename):
 
 DEFENSES = load_json("defenses.json")
 OFFENSE = load_json("offensive_concepts.json")
+GAME_PLAYS = load_json("game_plays.json")
 
 
 # =============================================================================
@@ -308,6 +309,12 @@ def index():
     return render_template("index.html")
 
 
+@app.route("/game")
+def game():
+    """Arcade game mode"""
+    return render_template("game.html")
+
+
 @app.route("/api/formations")
 def get_formations():
     """Get all defensive formations"""
@@ -465,6 +472,17 @@ def get_all_plays():
     return jsonify({
         "plays": plays,
         "count": len(plays)
+    })
+
+
+@app.route("/api/game-data")
+def get_game_data():
+    """Get game mode data - formations, plays, and coverage matchups"""
+    return jsonify({
+        "formations": GAME_PLAYS["formations"],
+        "coverage_matchups": GAME_PLAYS["coverage_matchups"],
+        "coverages": DEFENSES["coverages"],
+        "defensive_formations": DEFENSES["formations"]
     })
 
 
