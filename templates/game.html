@@ -778,6 +778,8 @@
             { formation: 'dime', coverage: 'cover_2', name: 'DIME COVER 2', blitz: false },
             { formation: 'dime', coverage: 'cover_3', name: 'DIME COVER 3', blitz: false },
             { formation: '4-3', coverage: 'cover_2', name: '4-3 COVER 2', blitz: false },
+            { formation: '4-3', coverage: 'tampa_2', name: '4-3 TAMPA 2', blitz: false },
+            { formation: 'nickel', coverage: 'tampa_2', name: 'NICKEL TAMPA 2', blitz: false },
             { formation: '3-4', coverage: 'cover_3', name: '3-4 COVER 3', blitz: false },
             // Man Coverages
             { formation: 'nickel', coverage: 'cover_0', name: 'NICKEL COVER 0 MAN', blitz: false },
@@ -1208,31 +1210,69 @@
         }
 
         // Coverage matchups - what routes work against each coverage
+        // Coverage matchups based on real football theory
+        // Perfect = route exploits coverage weakness
+        // Good = route can work with good timing
+        // Bad = route plays into coverage strength
         const coverageMatchups = {
+            cover_0: {
+                // No safety help - quick routes and deep shots work, sitting routes get jumped
+                perfect: ['Slant', 'Go', 'Post', 'Cross', 'Shallow'],
+                good: ['Dig', 'Corner', 'Out', 'Seam'],
+                bad: ['Curl', 'Hitch', 'Sit', 'Comeback', 'Check']
+            },
             cover_1: {
+                // Single high safety - crossers beat man, middle is open underneath
                 perfect: ['Cross', 'Shallow', 'Dig', 'Drag', 'Post'],
-                good: ['Corner', 'Seam', 'Out', 'Slant'],
+                good: ['Corner', 'Seam', 'Out', 'Slant', 'Angle'],
                 bad: ['Go', 'Hitch', 'Curl', 'Comeback']
             },
             cover_2: {
+                // Two deep safeties - attack the middle (hole shot), high-low the corners
                 perfect: ['Seam', 'Post', 'Corner', 'Dig'],
-                good: ['Curl', 'Out', 'Sit'],
-                bad: ['Go', 'Flat', 'Hitch', 'Shallow']
+                good: ['Curl', 'Out', 'Sit', 'Slant'],
+                bad: ['Go', 'Flat', 'Hitch', 'Shallow', 'Fade']
+            },
+            tampa_2: {
+                // MLB drops deep - seams are contested, corners still work
+                perfect: ['Corner', 'Dig', 'Out'],
+                good: ['Seam', 'Curl', 'Flat', 'Sit'],
+                bad: ['Post', 'Go', 'Shallow', 'Deep Cross']
             },
             cover_3: {
+                // Three deep - seams between corner/safety, flats are open
                 perfect: ['Seam', 'Curl', 'Flat', 'Shallow', 'Cross'],
-                good: ['Dig', 'Out', 'Corner', 'Sit'],
-                bad: ['Go', 'Post', 'Hitch']
+                good: ['Dig', 'Out', 'Corner', 'Sit', 'Angle'],
+                bad: ['Go', 'Post', 'Hitch', 'Fade']
             },
             cover_4: {
-                perfect: ['Flat', 'Curl', 'Hitch', 'Out', 'Shallow'],
-                good: ['Drag', 'Cross', 'Sit', 'Slant'],
-                bad: ['Go', 'Seam', 'Post', 'Corner']
+                // Four deep quarters - everything underneath is wide open
+                perfect: ['Flat', 'Curl', 'Hitch', 'Out', 'Shallow', 'Drag', 'Slant'],
+                good: ['Cross', 'Sit', 'Angle', 'Swing', 'Check'],
+                bad: ['Go', 'Seam', 'Post', 'Corner', 'Wheel', 'Deep Cross']
+            }
+        };
+
+        // Success probabilities for each read type
+        // Even perfect reads can fail (drops, great defensive plays)
+        const readProbabilities = {
+            perfect: {
+                bigPlay: 0.55,      // 55% chance of big play (15-40 yards)
+                goodPlay: 0.30,     // 30% chance of good play (5-15 yards)
+                incomplete: 0.10,   // 10% chance of drop/defended
+                disaster: 0.05      // 5% chance of INT/sack
             },
-            cover_0: {
-                perfect: ['Slant', 'Go', 'Post', 'Cross'],
-                good: ['Dig', 'Corner', 'Out'],
-                bad: ['Curl', 'Hitch', 'Sit', 'Comeback']
+            good: {
+                bigPlay: 0.15,      // 15% chance of big play
+                goodPlay: 0.50,     // 50% chance of good play
+                incomplete: 0.25,   // 25% chance of incomplete
+                disaster: 0.10      // 10% chance of INT/sack
+            },
+            bad: {
+                bigPlay: 0.05,      // 5% chance they still got lucky
+                goodPlay: 0.15,     // 15% chance of small gain
+                incomplete: 0.40,   // 40% chance of incomplete
+                disaster: 0.40      // 40% chance of INT/sack
             }
         };
 
@@ -1547,6 +1587,24 @@
                     'Post': 'Post was blanketed by the safety.',
                     'Corner': 'Corner route had two defenders in the area!'
                 }
+            },
+            tampa_2: {
+                name: 'Tampa 2 Zone',
+                perfect: {
+                    'Corner': 'Corner route beat the corner and the safety couldn\'t get over!',
+                    'Dig': 'Dig route found the soft spot before the MLB got depth!',
+                    'Out': 'Quick out got under the corner dropping to the flat!'
+                },
+                good: {
+                    'Seam': 'Seam got past the MLB but the safety closed.',
+                    'Curl': 'Curl found a window between the zones.',
+                    'Flat': 'Quick flat got out before the corner reacted.'
+                },
+                bad: {
+                    'Post': 'Post ran right into the dropping MLB! Tampa 2 takes this away!',
+                    'Go': 'Go route had safety help over the top.',
+                    'Shallow': 'The MLB was sitting on the shallow cross!'
+                }
             }
         };
 
@@ -1555,19 +1613,41 @@
             const matchup = coverageMatchups[coverage] || coverageMatchups.cover_3;
             const explanations = coverageExplanations[coverage] || coverageExplanations.cover_3;
 
-            let result;
             const route = receiver.route;
             const isBlitz = gameState.currentDefense.blitz;
 
+            // Determine read quality
+            let readQuality;
             if (matchup.perfect.some(r => route.includes(r))) {
-                result = calculatePerfectRead(receiver, coverage, explanations, isBlitz);
+                readQuality = 'perfect';
                 gameState.perfectReads++;
             } else if (matchup.good.some(r => route.includes(r))) {
-                result = calculateGoodRead(receiver, coverage, explanations, isBlitz);
+                readQuality = 'good';
                 gameState.goodReads++;
             } else {
-                result = calculateBadRead(receiver, coverage, explanations, isBlitz);
+                readQuality = 'bad';
                 gameState.badReads++;
+            }
+
+            // Get probability distribution for this read quality
+            const probs = readProbabilities[readQuality];
+
+            // Roll the dice!
+            const roll = Math.random();
+            let result;
+
+            if (roll < probs.bigPlay) {
+                // Big play!
+                result = calculateBigPlay(receiver, coverage, explanations, isBlitz, readQuality);
+            } else if (roll < probs.bigPlay + probs.goodPlay) {
+                // Good play
+                result = calculateGoodPlay(receiver, coverage, explanations, isBlitz, readQuality);
+            } else if (roll < probs.bigPlay + probs.goodPlay + probs.incomplete) {
+                // Incomplete
+                result = calculateIncomplete(receiver, coverage, explanations, isBlitz, readQuality);
+            } else {
+                // Disaster - INT or sack
+                result = calculateDisaster(receiver, coverage, explanations, isBlitz, readQuality);
             }
 
             showResult(result);
@@ -1620,94 +1700,144 @@
             showResult(result);
         }
 
-        function calculatePerfectRead(receiver, coverage, explanations, isBlitz) {
+        // New probability-based outcome functions
+        function calculateBigPlay(receiver, coverage, explanations, isBlitz, readQuality) {
             const yards = Math.floor(Math.random() * 26) + 15; // 15-40 yards
-
-            // Find specific explanation for this route
-            let detail = 'Wide open! The coverage couldn\'t handle it!';
             const route = receiver.route;
 
-            // Check for specific route explanation
-            for (const [routeType, explanation] of Object.entries(explanations.perfect || {})) {
-                if (route.includes(routeType)) {
-                    detail = explanation;
-                    break;
+            let detail = '';
+            let message = '';
+
+            if (readQuality === 'perfect') {
+                message = 'PERFECT READ!';
+                // Find specific explanation
+                for (const [routeType, explanation] of Object.entries(explanations.perfect || {})) {
+                    if (route.includes(routeType)) {
+                        detail = explanation;
+                        break;
+                    }
                 }
+                if (!detail) detail = 'Wide open! The coverage couldn\'t handle it!';
+                if (isBlitz) detail += ' The blitz left them vulnerable!';
+            } else if (readQuality === 'good') {
+                message = 'GREAT THROW!';
+                detail = `Fit the ${route} into a tight window! Great ball placement.`;
+            } else {
+                message = 'GOT LUCKY!';
+                detail = `The defender slipped! ${route} was covered but still came down with it.`;
             }
 
-            if (isBlitz) {
-                detail += ' The blitz left them vulnerable!';
-            }
-
-            return {
-                type: 'big-play',
-                yards: yards,
-                message: 'PERFECT READ!',
-                detail: detail
-            };
+            return { type: 'big-play', yards, message, detail };
         }
 
-        function calculateGoodRead(receiver, coverage, explanations, isBlitz) {
+        function calculateGoodPlay(receiver, coverage, explanations, isBlitz, readQuality) {
             const yards = Math.floor(Math.random() * 11) + 5; // 5-15 yards
-
-            let detail = 'Found a soft spot in the coverage.';
             const route = receiver.route;
 
-            // Check for specific route explanation
-            for (const [routeType, explanation] of Object.entries(explanations.good || {})) {
-                if (route.includes(routeType)) {
-                    detail = explanation;
-                    break;
+            let detail = '';
+            let message = '';
+
+            if (readQuality === 'perfect') {
+                message = 'SOLID GAIN!';
+                for (const [routeType, explanation] of Object.entries(explanations.perfect || {})) {
+                    if (route.includes(routeType)) {
+                        detail = explanation;
+                        break;
+                    }
                 }
+                if (!detail) detail = 'Found the soft spot but couldn\'t break free for more.';
+            } else if (readQuality === 'good') {
+                message = 'GOOD READ!';
+                for (const [routeType, explanation] of Object.entries(explanations.good || {})) {
+                    if (route.includes(routeType)) {
+                        detail = explanation;
+                        break;
+                    }
+                }
+                if (!detail) detail = 'Found a window in the coverage.';
+            } else {
+                message = 'TOUGH CATCH!';
+                detail = `${receiver.name} made a contested catch on the ${route}. Defender was there.`;
             }
 
-            return {
-                type: 'good-play',
-                yards: yards,
-                message: 'GOOD READ!',
-                detail: detail
-            };
+            return { type: 'good-play', yards, message, detail };
         }
 
-        function calculateBadRead(receiver, coverage, explanations, isBlitz) {
-            const roll = Math.random();
+        function calculateIncomplete(receiver, coverage, explanations, isBlitz, readQuality) {
             const route = receiver.route;
             const coverageName = explanations.name || 'the coverage';
 
-            // Find specific bad route explanation
-            let badDetail = `The ${route} route was covered by ${coverageName}.`;
-            for (const [routeType, explanation] of Object.entries(explanations.bad || {})) {
-                if (route.includes(routeType)) {
-                    badDetail = explanation;
-                    break;
+            let detail = '';
+            let message = 'INCOMPLETE!';
+
+            if (readQuality === 'perfect') {
+                // Even perfect reads can fail
+                const reasons = [
+                    `${receiver.name} dropped it! The ${route} was wide open!`,
+                    `Ball was slightly overthrown on the ${route}. Receiver couldn\'t adjust.`,
+                    `Defender made an incredible play to break up the ${route}!`,
+                    `The ${route} was open but the throw was behind the receiver.`
+                ];
+                detail = reasons[Math.floor(Math.random() * reasons.length)];
+            } else if (readQuality === 'good') {
+                const reasons = [
+                    `Good coverage on the ${route}. Ball was deflected.`,
+                    `${receiver.name} couldn\'t secure it with the defender draped on him.`,
+                    `Throw was a bit high - ${route} couldn\'t come down with it.`
+                ];
+                detail = reasons[Math.floor(Math.random() * reasons.length)];
+            } else {
+                // Bad read incomplete
+                for (const [routeType, explanation] of Object.entries(explanations.bad || {})) {
+                    if (route.includes(routeType)) {
+                        detail = explanation;
+                        break;
+                    }
                 }
+                if (!detail) detail = `The ${route} was blanketed by ${coverageName}.`;
             }
 
-            if (roll < 0.3) {
-                return {
-                    type: 'turnover',
-                    yards: 0,
-                    message: 'INTERCEPTED!',
-                    detail: badDetail + ' The defender jumped the route!',
-                    turnover: true
-                };
-            } else if (roll < 0.6) {
-                const sackDetail = isBlitz
-                    ? `The ${gameState.currentDefense.blitzType} got home! No time to throw!`
-                    : 'Held the ball too long looking for an open receiver.';
-                return {
-                    type: 'bad-play',
-                    yards: -7,
-                    message: 'SACKED!',
-                    detail: sackDetail
-                };
+            return { type: 'bad-play', yards: 0, message, detail };
+        }
+
+        function calculateDisaster(receiver, coverage, explanations, isBlitz, readQuality) {
+            const route = receiver.route;
+            const coverageName = explanations.name || 'the coverage';
+
+            // 50/50 between INT and sack (unless blitz, then more sacks)
+            const isSack = isBlitz ? Math.random() < 0.7 : Math.random() < 0.5;
+
+            if (isSack) {
+                let detail = '';
+                if (isBlitz) {
+                    detail = `The ${gameState.currentDefense.blitzType} got home! No time to throw!`;
+                } else if (readQuality === 'bad') {
+                    detail = `Held the ball too long looking for an open receiver. The ${route} was covered!`;
+                } else {
+                    detail = 'Protection broke down. Had to take the sack.';
+                }
+                return { type: 'bad-play', yards: -7, message: 'SACKED!', detail };
             } else {
-                return {
-                    type: 'bad-play',
-                    yards: 0,
-                    message: 'INCOMPLETE!',
-                    detail: badDetail
-                };
+                let detail = '';
+                if (readQuality === 'perfect') {
+                    const reasons = [
+                        `Receiver and QB miscommunicated on the ${route}! Defender was in the right spot.`,
+                        `Ball slipped - terrible throw into ${coverageName}!`,
+                        `Tipped at the line and picked off!`
+                    ];
+                    detail = reasons[Math.floor(Math.random() * reasons.length)];
+                } else if (readQuality === 'good') {
+                    detail = `Tried to force the ${route} into coverage. Defender jumped it!`;
+                } else {
+                    for (const [routeType, explanation] of Object.entries(explanations.bad || {})) {
+                        if (route.includes(routeType)) {
+                            detail = explanation + ' The defender jumped the route!';
+                            break;
+                        }
+                    }
+                    if (!detail) detail = `Terrible decision throwing the ${route} into ${coverageName}. Easy pick!`;
+                }
+                return { type: 'turnover', yards: 0, message: 'INTERCEPTED!', detail, turnover: true };
             }
         }
 
