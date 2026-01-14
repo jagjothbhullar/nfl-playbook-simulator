@@ -1473,11 +1473,10 @@
                 bad: ['Post', 'Go', 'Shallow', 'Deep Cross']
             },
             cover_3: {
-                // Three deep, FOUR underneath - attack between zones
-                // Seams depend on safety shade - NOT automatic, moved to good
-                // Shallow crossers work well under the zone
-                perfect: ['Cross', 'Shallow', 'Drag'],  // Low crossers under zones
-                good: ['Seam', 'Curl', 'Flat', 'Hitch', 'Out', 'Dig', 'Angle', 'Slant'],  // Seam depends on safety shade
+                // Three deep, FOUR underneath - seam is the best read but not automatic
+                // 4 underneath defenders make low crossers difficult too
+                perfect: ['Seam'],  // Best read, but safety shade adds variance
+                good: ['Cross', 'Shallow', 'Drag', 'Curl', 'Flat', 'Hitch', 'Out', 'Dig', 'Angle', 'Slant'],
                 bad: ['Go', 'Post', 'Corner', 'Fade', 'Wheel']  // Into deep thirds
             },
             cover_4: {
@@ -1876,12 +1875,12 @@
             cover_3: {
                 name: 'Cover 3 Zone',
                 perfect: {
-                    'Shallow': 'Shallow cross ran under the dropping linebackers!',
-                    'Cross': 'Crossing route found open grass between the zones!',
-                    'Drag': 'Drag route ran free underneath the zone!'
+                    'Seam': 'Seam route attacked the hole between the corner and safety!'
                 },
                 good: {
-                    'Seam': 'Seam found a window - but the safety shaded that way. Contested catch.',
+                    'Shallow': 'Shallow cross got under the zone but LBs closed.',
+                    'Cross': 'Crossing route found grass but 4 underneath made it tight.',
+                    'Drag': 'Drag got open but the underneath defenders rallied.',
                     'Curl': 'Curl found a soft spot, but the LB closed quickly. Short gain.',
                     'Flat': 'Flat got the catch but the corner was in conflict - limited yards.',
                     'Hitch': 'Hitch was open briefly before the zone closed. Got what we could.',
@@ -1962,7 +1961,23 @@
             }
 
             // Get probability distribution for this read quality
-            const probs = readProbabilities[readQuality];
+            let probs = { ...readProbabilities[readQuality] };
+
+            // Vertical routes (Seam, Go, Post, Corner, Wheel) have reduced big play % even on perfect reads
+            // Safety help, timing, and coverage shade add variance to deep throws
+            const verticalRoutes = ['Seam', 'Go', 'Post', 'Corner', 'Wheel', 'Fade'];
+            const isVertical = verticalRoutes.some(r => route.includes(r));
+
+            if (isVertical && readQuality === 'perfect') {
+                // Vertical perfect reads: 40% big play instead of 55%
+                // Redistribute to good play and incomplete
+                probs = {
+                    bigPlay: 0.40,       // Down from 55%
+                    goodPlay: 0.35,      // Up from 30%
+                    incomplete: 0.18,    // Up from 10% (safety help, timing)
+                    disaster: 0.07       // Slightly up from 5%
+                };
+            }
 
             // Roll the dice!
             const roll = Math.random();
