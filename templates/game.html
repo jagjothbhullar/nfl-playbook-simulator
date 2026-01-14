@@ -43,7 +43,8 @@
             background: #0a0a0a;
             min-height: 100vh;
             color: #00ff00;
-            overflow: hidden;
+            overflow-x: hidden;
+            overflow-y: auto;
             animation: flicker 0.15s infinite;
         }
 
@@ -159,8 +160,8 @@
         .game-area {
             background: linear-gradient(180deg, #0a1a0a 0%, #051505 100%);
             border: 4px solid #00ff00;
-            padding: 20px;
-            min-height: 450px;
+            padding: 15px;
+            min-height: 380px;
             position: relative;
             box-shadow: 0 0 30px rgba(0, 255, 0, 0.3), inset 0 0 50px rgba(0, 255, 0, 0.05);
         }
@@ -464,23 +465,23 @@
         /* Start Screen */
         .start-screen {
             text-align: center;
-            padding: 50px 20px;
+            padding: 20px 15px;
         }
 
         .start-screen h1 {
             font-family: 'Press Start 2P', cursive;
-            font-size: 2.5rem;
+            font-size: 1.8rem;
             color: #ff00ff;
-            margin-bottom: 30px;
+            margin-bottom: 15px;
             animation: neonPulse 2s ease-in-out infinite;
-            line-height: 1.5;
+            line-height: 1.4;
         }
 
         .start-screen .instructions {
-            font-size: 1.4rem;
+            font-size: 1.2rem;
             color: #00ffff;
-            margin-bottom: 40px;
-            line-height: 2;
+            margin-bottom: 20px;
+            line-height: 1.8;
         }
 
         .start-screen .instructions span {
@@ -489,8 +490,8 @@
 
         .start-btn {
             font-family: 'Press Start 2P', cursive;
-            font-size: 1.5rem;
-            padding: 30px 60px;
+            font-size: 1.2rem;
+            padding: 20px 40px;
             background: linear-gradient(180deg, #ff0000 0%, #aa0000 100%);
             border: 4px solid #ffff00;
             color: #fff;
@@ -499,7 +500,7 @@
         }
 
         .start-btn:hover {
-            transform: scale(1.1);
+            transform: scale(1.05);
             box-shadow: 0 0 40px rgba(255, 0, 0, 0.8);
         }
 
@@ -586,40 +587,218 @@
         }
 
         @media (max-width: 700px) {
+            .game-container {
+                padding: 5px;
+            }
+
+            .score-bar {
+                padding: 10px 15px;
+                margin-bottom: 10px;
+            }
+
             .formation-grid {
                 grid-template-columns: 1fr;
+                gap: 10px;
+            }
+
+            .formation-btn {
+                padding: 15px 10px;
+                font-size: 0.75rem;
             }
 
             .play-grid {
                 grid-template-columns: repeat(2, 1fr);
+                gap: 8px;
             }
 
             .game-title {
-                font-size: 0.8rem;
+                font-size: 0.7rem;
+            }
+
+            .score-display {
+                font-size: 1rem;
+            }
+
+            .info-bar {
+                grid-template-columns: repeat(4, 1fr);
+                gap: 5px;
+                margin-bottom: 10px;
+            }
+
+            .info-box {
+                padding: 8px 5px;
+            }
+
+            .info-box .label {
+                font-size: 0.7rem;
+            }
+
+            .info-box .value {
+                font-size: 1rem;
+            }
+
+            .game-area {
+                padding: 10px;
+                min-height: auto;
+            }
+
+            .start-screen {
+                padding: 15px 10px;
+            }
+
+            .start-screen h1 {
+                font-size: 1.4rem;
+                margin-bottom: 10px;
+            }
+
+            .start-screen .instructions {
+                font-size: 1rem;
+                margin-bottom: 15px;
+                line-height: 1.6;
+            }
+
+            .start-btn {
+                font-size: 1rem;
+                padding: 15px 30px;
+            }
+
+            .field-diagram {
+                height: 320px;
+            }
+
+            .receiver-btn {
+                width: 55px;
+                height: 55px;
+                font-size: 0.45rem;
+            }
+
+            .play-btn .play-diagram {
+                height: 80px;
+            }
+
+            .route-legend {
+                flex-wrap: wrap;
+                gap: 8px;
+                font-size: 0.75rem;
+            }
+
+            .defense-display .defense-name {
+                font-size: 1rem;
+                padding: 10px;
+            }
+
+            .phase-title h3 {
+                font-size: 0.9rem;
+            }
+        }
+
+        /* Extra small screens */
+        @media (max-width: 480px) {
+            .score-bar {
+                flex-direction: column;
+                gap: 5px;
+                padding: 8px 10px;
+            }
+
+            .start-screen h1 {
+                font-size: 1.2rem;
+            }
+
+            .start-screen .instructions {
+                font-size: 0.9rem;
+                line-height: 1.5;
+            }
+
+            .start-btn {
+                font-size: 0.9rem;
+                padding: 12px 25px;
             }
 
             .info-bar {
                 grid-template-columns: repeat(2, 1fr);
             }
 
-            .field-diagram {
-                height: 400px;
-            }
-
-            .receiver-btn {
-                width: 65px;
-                height: 65px;
-                font-size: 0.5rem;
+            .play-grid {
+                grid-template-columns: repeat(2, 1fr);
             }
 
             .play-btn .play-diagram {
-                height: 90px;
+                height: 70px;
             }
 
-            .route-legend {
-                flex-wrap: wrap;
-                gap: 10px;
+            .field-diagram {
+                height: 280px;
+            }
+
+            .receiver-btn {
+                width: 45px;
+                height: 45px;
+                font-size: 0.4rem;
+            }
+
+            .result-overlay .result-content {
+                padding: 20px;
+                max-width: 95%;
+            }
+
+            .result-overlay .result-yardage {
+                font-size: 2rem;
+            }
+        }
+
+        /* Very small screens */
+        @media (max-width: 380px) {
+            .start-screen h1 {
+                font-size: 1rem;
+            }
+
+            .start-screen .instructions {
                 font-size: 0.8rem;
+            }
+
+            .start-btn {
+                font-size: 0.8rem;
+                padding: 10px 20px;
+            }
+        }
+
+        /* Height-based responsive - ensure things fit vertically */
+        @media (max-height: 700px) {
+            .game-area {
+                min-height: auto;
+            }
+
+            .start-screen {
+                padding: 10px;
+            }
+
+            .start-screen h1 {
+                font-size: 1.3rem;
+                margin-bottom: 8px;
+            }
+
+            .start-screen .instructions {
+                font-size: 0.95rem;
+                margin-bottom: 12px;
+                line-height: 1.5;
+            }
+
+            .start-btn {
+                font-size: 0.95rem;
+                padding: 12px 25px;
+            }
+
+            .score-bar {
+                padding: 8px 15px;
+                margin-bottom: 8px;
+            }
+
+            .info-bar {
+                margin-bottom: 8px;
+            }
+
+            .info-box {
+                padding: 8px;
             }
         }
     </style>
@@ -1240,10 +1419,11 @@
                 bad: ['Post', 'Go', 'Shallow', 'Deep Cross']
             },
             cover_3: {
-                // Three deep - seams between corner/safety, flats are open
-                perfect: ['Seam', 'Curl', 'Flat', 'Shallow', 'Cross'],
-                good: ['Dig', 'Out', 'Corner', 'Sit', 'Angle'],
-                bad: ['Go', 'Post', 'Hitch', 'Fade']
+                // Three deep, FOUR underneath - seams work, middle is crowded
+                // Flats/hitches can get yards but 4 underneath defenders limit big plays
+                perfect: ['Seam', 'Cross', 'Shallow'],  // Attack between zones
+                good: ['Curl', 'Flat', 'Hitch', 'Out', 'Dig', 'Angle', 'Slant'],  // Can work, limited yards
+                bad: ['Go', 'Post', 'Corner', 'Fade', 'Wheel']  // Into deep thirds
             },
             cover_4: {
                 // Four deep quarters - everything underneath is wide open
@@ -1551,20 +1731,22 @@
                 name: 'Cover 3 Zone',
                 perfect: {
                     'Seam': 'Seam route found the hole between the corner and safety!',
-                    'Curl': 'Curl sat perfectly in the soft spot of Cover 3!',
-                    'Flat': 'Flat route got outside before the corner could react!',
                     'Shallow': 'Shallow cross ran under the dropping linebackers!',
-                    'Cross': 'Crossing route found open grass in the zone!'
+                    'Cross': 'Crossing route found open grass between the zones!'
                 },
                 good: {
-                    'Dig': 'Dig found a window in the zone.',
-                    'Out': 'Out route worked against the zone.',
-                    'Corner': 'Corner found space in the deep third.'
+                    'Curl': 'Curl found a soft spot, but the LB closed quickly. Short gain.',
+                    'Flat': 'Flat got the catch but the corner was in conflict - limited yards.',
+                    'Hitch': 'Hitch was open briefly before the zone closed. Got what we could.',
+                    'Out': 'Out route worked but the underneath defender rallied.',
+                    'Dig': 'Dig found a window but 4 underneath made it tight.',
+                    'Slant': 'Slant got in quick before the zone reacted.'
                 },
                 bad: {
                     'Go': 'Go route ran into the deep third coverage!',
                     'Post': 'Post went right at the deep safety!',
-                    'Hitch': 'Hitch was bracketed by zone defenders.'
+                    'Corner': 'Corner route ran into the deep third - CB had help!',
+                    'Wheel': 'Wheel route got tracked by the deep coverage.'
                 }
             },
             cover_4: {
