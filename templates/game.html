@@ -1654,46 +1654,115 @@
         }
 
         function resolveRunPlay() {
-            const coverage = gameState.currentDefense.coverage;
             const formation = gameState.currentDefense.formation;
+            const coverage = gameState.currentDefense.coverage;
             const isBlitz = gameState.currentDefense.blitz;
+            const defenseName = gameState.currentDefense.name;
 
-            // Run effectiveness based on defense
-            let baseYards = Math.floor(Math.random() * 6) + 2; // 2-7 yards base
+            // Run effectiveness modifiers based on defensive personnel
+            // More DBs = fewer run stoppers = better for the run game
+            const personnelModifiers = {
+                'dime': { bonus: 8, bigPlayChance: 0.35, description: '6 DBs on the field - only 1 LB!' },
+                'nickel': { bonus: 3, bigPlayChance: 0.20, description: '5 DBs means lighter box' },
+                '4-3': { bonus: 0, bigPlayChance: 0.10, description: '4-3 has gap integrity' },
+                '3-4': { bonus: -1, bigPlayChance: 0.08, description: '3-4 has 4 LBs to fill gaps' }
+            };
 
-            // Blitzes are great to run against
+            const personnel = personnelModifiers[formation] || personnelModifiers['4-3'];
+
+            // Base yards: 1-5
+            let baseYards = Math.floor(Math.random() * 5) + 1;
+
+            // Apply personnel modifier
+            baseYards += personnel.bonus;
+
+            // Blitzes are GREAT for runs - vacated gaps!
             if (isBlitz) {
-                baseYards += Math.floor(Math.random() * 6) + 4;
-            }
-            // Dime = good for run
-            else if (formation === 'dime') {
-                baseYards += Math.floor(Math.random() * 5) + 3;
-            }
-            // Nickel = okay for run
-            else if (formation === 'nickel') {
-                baseYards += Math.floor(Math.random() * 3);
-            }
-            // 4-3/3-4 = tough for run
-            else {
-                baseYards -= Math.floor(Math.random() * 2);
+                baseYards += Math.floor(Math.random() * 6) + 5; // +5-10 yards
             }
 
-            baseYards = Math.max(baseYards, -2);
+            // Cover 4 teams often have safeties playing deep, less run support
+            if (coverage === 'cover_4') {
+                baseYards += Math.floor(Math.random() * 3) + 1;
+            }
 
+            // Variance: sometimes you break one, sometimes you get stuffed
+            const roll = Math.random();
             let result;
-            if (baseYards >= 10) {
-                const detail = isBlitz ? 'The blitz left a huge running lane!' : 'The defense was spread thin - dime package can\'t stop the run!';
-                result = { type: 'big-play', yards: baseYards, message: 'HUGE HOLE!', detail };
+
+            if (isBlitz && roll < 0.40) {
+                // 40% chance of huge play against blitz
+                baseYards = Math.floor(Math.random() * 20) + 15; // 15-35 yards
+                result = {
+                    type: 'big-play',
+                    yards: baseYards,
+                    message: 'HOUSE CALL!',
+                    detail: `The ${gameState.currentDefense.blitzType} left the box empty! Massive running lane!`
+                };
+                gameState.perfectReads++;
+            } else if (formation === 'dime' && roll < personnel.bigPlayChance + 0.25) {
+                // Big play chance against dime
+                baseYards = Math.floor(Math.random() * 15) + 12; // 12-27 yards
+                result = {
+                    type: 'big-play',
+                    yards: baseYards,
+                    message: 'GASHED EM!',
+                    detail: `${personnel.description} They can\'t stop the run with that personnel!`
+                };
+                gameState.perfectReads++;
+            } else if (roll < personnel.bigPlayChance) {
+                // Normal big play
+                baseYards = Math.floor(Math.random() * 10) + 10; // 10-20 yards
+                result = {
+                    type: 'big-play',
+                    yards: baseYards,
+                    message: 'BROKE FREE!',
+                    detail: 'Hit the hole and found daylight! Great vision!'
+                };
                 gameState.perfectReads++;
             } else if (baseYards >= 4) {
-                const detail = isBlitz ? 'Good call running against the blitz!' : 'Solid downhill running against light personnel!';
+                // Good gain
+                let detail = '';
+                if (formation === 'dime') {
+                    detail = 'Running against dime - smart call! Only one linebacker to beat.';
+                } else if (formation === 'nickel') {
+                    detail = 'Nickel package is light. Good downhill running!';
+                } else if (isBlitz) {
+                    detail = 'Ran right at the blitzing defender\'s vacated gap!';
+                } else {
+                    detail = 'O-line created a crease. Solid gain!';
+                }
                 result = { type: 'good-play', yards: baseYards, message: 'SOLID GAIN!', detail };
                 gameState.goodReads++;
-            } else if (baseYards >= 0) {
-                result = { type: 'bad-play', yards: baseYards, message: 'STUFFED!', detail: 'The linebackers filled the gap quickly.' };
+            } else if (baseYards >= 1) {
+                // Minimal gain
+                let detail = '';
+                if (formation === '3-4' || formation === '4-3') {
+                    detail = 'Ran into a loaded box. LBs filled quickly.';
+                } else {
+                    detail = 'Got what the defense gave. Nothing more.';
+                }
+                result = { type: 'bad-play', yards: baseYards, message: 'SHORT GAIN', detail };
+                gameState.badReads++;
+            } else if (roll > 0.85 && (formation === '4-3' || formation === '3-4')) {
+                // TFL against base defense
+                baseYards = -Math.floor(Math.random() * 3) - 1; // -1 to -3
+                result = {
+                    type: 'bad-play',
+                    yards: baseYards,
+                    message: 'TFL!',
+                    detail: 'Linebacker shot the gap! Loss of yards!'
+                };
                 gameState.badReads++;
             } else {
-                result = { type: 'bad-play', yards: baseYards, message: 'LOSS!', detail: 'The defense blew it up in the backfield!' };
+                // No gain
+                baseYards = 0;
+                result = {
+                    type: 'bad-play',
+                    yards: 0,
+                    message: 'STUFFED!',
+                    detail: 'Defense held at the line of scrimmage.'
+                };
                 gameState.badReads++;
             }
 
