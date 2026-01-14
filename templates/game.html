@@ -428,9 +428,15 @@
         .game-over h2 {
             font-family: 'Press Start 2P', cursive;
             font-size: 2.5rem;
-            color: #ff00ff;
+            color: #00ff00;
             margin-bottom: 30px;
-            animation: neonPulse 1s ease-in-out infinite;
+            text-shadow: 0 0 5px currentColor, 0 0 10px currentColor;
+            animation: touchdownPulse 0.5s ease-in-out infinite;
+        }
+
+        @keyframes touchdownPulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.05); opacity: 0.95; }
         }
 
         .game-over .final-score {
@@ -2123,6 +2129,7 @@
                     // TOUCHDOWN!
                     setTimeout(() => {
                         gameState.score += 6;
+                        updateDisplay(); // Update the score in header
                         showGameOver('TOUCHDOWN!');
                     }, 1500);
                     return;
