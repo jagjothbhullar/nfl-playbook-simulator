@@ -1473,10 +1473,11 @@
                 bad: ['Post', 'Go', 'Shallow', 'Deep Cross']
             },
             cover_3: {
-                // Three deep, FOUR underneath - seams work, middle is crowded
-                // Flats/hitches can get yards but 4 underneath defenders limit big plays
-                perfect: ['Seam', 'Cross', 'Shallow'],  // Attack between zones
-                good: ['Curl', 'Flat', 'Hitch', 'Out', 'Dig', 'Angle', 'Slant'],  // Can work, limited yards
+                // Three deep, FOUR underneath - attack between zones
+                // Seams depend on safety shade - NOT automatic, moved to good
+                // Shallow crossers work well under the zone
+                perfect: ['Cross', 'Shallow', 'Drag'],  // Low crossers under zones
+                good: ['Seam', 'Curl', 'Flat', 'Hitch', 'Out', 'Dig', 'Angle', 'Slant'],  // Seam depends on safety shade
                 bad: ['Go', 'Post', 'Corner', 'Fade', 'Wheel']  // Into deep thirds
             },
             cover_4: {
@@ -1875,17 +1876,19 @@
             cover_3: {
                 name: 'Cover 3 Zone',
                 perfect: {
-                    'Seam': 'Seam route found the hole between the corner and safety!',
                     'Shallow': 'Shallow cross ran under the dropping linebackers!',
-                    'Cross': 'Crossing route found open grass between the zones!'
+                    'Cross': 'Crossing route found open grass between the zones!',
+                    'Drag': 'Drag route ran free underneath the zone!'
                 },
                 good: {
+                    'Seam': 'Seam found a window - but the safety shaded that way. Contested catch.',
                     'Curl': 'Curl found a soft spot, but the LB closed quickly. Short gain.',
                     'Flat': 'Flat got the catch but the corner was in conflict - limited yards.',
                     'Hitch': 'Hitch was open briefly before the zone closed. Got what we could.',
                     'Out': 'Out route worked but the underneath defender rallied.',
                     'Dig': 'Dig found a window but 4 underneath made it tight.',
-                    'Slant': 'Slant got in quick before the zone reacted.'
+                    'Slant': 'Slant got in quick before the zone reacted.',
+                    'Angle': 'Angle route found soft spot in the zone.'
                 },
                 bad: {
                     'Go': 'Go route ran into the deep third coverage!',
