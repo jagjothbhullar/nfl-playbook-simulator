@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NFL Playbook Simulator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Russo+One&family=Roboto+Condensed:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Roboto Condensed', sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            min-height: 100vh;
+            color: #e0e0e0;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            padding: 30px 20px;
+            background: linear-gradient(180deg, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0.2) 100%);
+            border-bottom: 4px solid #e63946;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-family: 'Russo One', sans-serif;
+            font-size: 2.8rem;
+            color: #fff;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            text-shadow: 3px 3px 0 #e63946;
+        }
+
+        .header p {
+            color: #aaa;
+            margin-top: 10px;
+            font-size: 1.1rem;
+        }
+
+        /* Main Layout */
+        .main-layout {
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            gap: 30px;
+        }
+
+        @media (max-width: 900px) {
+            .main-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Defense Selector Panel */
+        .selector-panel {
+            background: rgba(0, 0, 0, 0.4);
+            border: 2px solid #333;
+            border-radius: 10px;
+            padding: 25px;
+        }
+
+        .selector-panel h2 {
+            font-family: 'Russo One', sans-serif;
+            color: #e63946;
+            font-size: 1.4rem;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            border-bottom: 2px solid #e63946;
+            padding-bottom: 10px;
+        }
+
+        .selector-group {
+            margin-bottom: 25px;
+        }
+
+        .selector-group label {
+            display: block;
+            color: #aaa;
+            font-size: 0.9rem;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .selector-group select {
+            width: 100%;
+            padding: 12px 15px;
+            font-size: 1rem;
+            border: 2px solid #444;
+            border-radius: 6px;
+            background: #1a1a2e;
+            color: #fff;
+            cursor: pointer;
+            font-family: 'Roboto Condensed', sans-serif;
+        }
+
+        .selector-group select:focus {
+            outline: none;
+            border-color: #e63946;
+        }
+
+        .analyze-btn {
+            width: 100%;
+            padding: 15px;
+            font-size: 1.2rem;
+            font-family: 'Russo One', sans-serif;
+            background: linear-gradient(180deg, #e63946 0%, #b71c1c 100%);
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            transition: all 0.2s;
+        }
+
+        .analyze-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(230, 57, 70, 0.4);
+        }
+
+        /* Defense Info */
+        .defense-info {
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(230, 57, 70, 0.1);
+            border-radius: 8px;
+            border-left: 4px solid #e63946;
+        }
+
+        .defense-info h4 {
+            color: #e63946;
+            margin-bottom: 8px;
+        }
+
+        .defense-info p {
+            color: #aaa;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        .defense-info .tag {
+            display: inline-block;
+            padding: 3px 8px;
+            background: rgba(230, 57, 70, 0.3);
+            border-radius: 4px;
+            font-size: 0.8rem;
+            margin-right: 5px;
+            margin-top: 5px;
+        }
+
+        /* Results Panel */
+        .results-panel {
+            display: none;
+        }
+
+        .results-panel.active {
+            display: block;
+        }
+
+        /* Play Diagram */
+        .diagram-container {
+            background: rgba(0, 0, 0, 0.5);
+            border: 2px solid #333;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 25px;
+        }
+
+        .diagram-container h3 {
+            font-family: 'Russo One', sans-serif;
+            color: #fff;
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+        }
+
+        .diagram-svg {
+            width: 100%;
+            max-width: 500px;
+            margin: 0 auto;
+            display: block;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .diagram-legend {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.85rem;
+            color: #aaa;
+        }
+
+        .legend-dot {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+        }
+
+        .legend-triangle {
+            width: 0;
+            height: 0;
+            border-left: 8px solid transparent;
+            border-right: 8px solid transparent;
+            border-bottom: 14px solid;
+        }
+
+        /* Key Advice */
+        .key-advice {
+            background: linear-gradient(135deg, rgba(76, 175, 80, 0.2) 0%, rgba(76, 175, 80, 0.1) 100%);
+            border: 2px solid #4caf50;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 25px;
+        }
+
+        .key-advice h3 {
+            font-family: 'Russo One', sans-serif;
+            color: #4caf50;
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+        }
+
+        .key-advice .priority {
+            font-size: 1.2rem;
+            color: #fff;
+            margin-bottom: 10px;
+        }
+
+        .key-advice .advice {
+            color: #aaa;
+            line-height: 1.6;
+        }
+
+        /* Concepts Grid */
+        .concepts-section {
+            margin-bottom: 25px;
+        }
+
+        .concepts-section h3 {
+            font-family: 'Russo One', sans-serif;
+            color: #fff;
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .concepts-section h3 .icon {
+            font-size: 1.5rem;
+        }
+
+        .concepts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 15px;
+        }
+
+        .concept-card {
+            background: rgba(0, 0, 0, 0.4);
+            border: 2px solid #333;
+            border-radius: 10px;
+            padding: 20px;
+            transition: all 0.2s;
+        }
+
+        .concept-card:hover {
+            border-color: #4caf50;
+            transform: translateY(-3px);
+        }
+
+        .concept-card.pass {
+            border-left: 4px solid #2196f3;
+        }
+
+        .concept-card.run {
+            border-left: 4px solid #ff9800;
+        }
+
+        .concept-card h4 {
+            color: #fff;
+            font-size: 1.1rem;
+            margin-bottom: 8px;
+        }
+
+        .concept-card .routes {
+            color: #888;
+            font-size: 0.85rem;
+            margin-bottom: 10px;
+        }
+
+        .concept-card .description {
+            color: #aaa;
+            font-size: 0.9rem;
+            margin-bottom: 12px;
+            line-height: 1.4;
+        }
+
+        .concept-card .why-works {
+            background: rgba(76, 175, 80, 0.15);
+            padding: 10px;
+            border-radius: 6px;
+            margin-bottom: 10px;
+        }
+
+        .concept-card .why-works strong {
+            color: #4caf50;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+        }
+
+        .concept-card .why-works p {
+            color: #ccc;
+            font-size: 0.9rem;
+            margin-top: 5px;
+        }
+
+        .concept-card .key-read {
+            color: #888;
+            font-size: 0.85rem;
+            font-style: italic;
+        }
+
+        /* Loading */
+        .loading {
+            text-align: center;
+            padding: 50px;
+            display: none;
+        }
+
+        .loading.active {
+            display: block;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid #333;
+            border-top-color: #e63946;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Placeholder */
+        .placeholder {
+            text-align: center;
+            padding: 80px 20px;
+            color: #666;
+        }
+
+        .placeholder .icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+        }
+
+        .placeholder h3 {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+            color: #888;
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 30px;
+            color: #555;
+            font-size: 0.9rem;
+            margin-top: 30px;
+        }
+
+        /* Soft spots legend */
+        .soft-spots-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 15px;
+            background: rgba(0, 255, 0, 0.1);
+            border-radius: 6px;
+            margin-top: 15px;
+        }
+
+        .soft-spots-info .pulse-dot {
+            width: 20px;
+            height: 20px;
+            background: rgba(0, 255, 0, 0.5);
+            border: 2px solid #00ff00;
+            border-radius: 50%;
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.6; }
+            50% { transform: scale(1.2); opacity: 0.3; }
+        }
+
+        .soft-spots-info span {
+            color: #00ff00;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>NFL Playbook Simulator</h1>
+            <p>Select the defense and find the best offensive answers</p>
+        </div>
+
+        <div class="main-layout">
+            <!-- Selector Panel -->
+            <div class="selector-panel">
+                <h2>Defense Setup</h2>
+
+                <div class="selector-group">
+                    <label>Formation</label>
+                    <select id="formationSelect">
+                        <option value="4-3">4-3 Base</option>
+                        <option value="3-4">3-4 Base</option>
+                        <option value="nickel">Nickel (5 DB)</option>
+                        <option value="dime">Dime (6 DB)</option>
+                        <option value="quarter">Quarter (7 DB)</option>
+                        <option value="goal_line">Goal Line</option>
+                        <option value="big_nickel">Big Nickel</option>
+                    </select>
+                </div>
+
+                <div class="selector-group">
+                    <label>Coverage</label>
+                    <select id="coverageSelect">
+                        <option value="cover_0">Cover 0 (Man, No Safety)</option>
+                        <option value="cover_1">Cover 1 (Man Free)</option>
+                        <option value="cover_1_robber">Cover 1 Robber</option>
+                        <option value="cover_2">Cover 2</option>
+                        <option value="cover_2_man">Cover 2 Man</option>
+                        <option value="tampa_2">Tampa 2</option>
+                        <option value="cover_3" selected>Cover 3</option>
+                        <option value="cover_3_sky">Cover 3 Sky</option>
+                        <option value="cover_3_cloud">Cover 3 Cloud</option>
+                        <option value="cover_3_match">Cover 3 Match</option>
+                        <option value="cover_4">Cover 4 (Quarters)</option>
+                        <option value="cover_4_palms">Cover 4 Palms</option>
+                        <option value="cover_6">Cover 6</option>
+                        <option value="cover_2_trap">Cover 2 Trap</option>
+                    </select>
+                </div>
+
+                <div class="selector-group">
+                    <label>Blitz Package</label>
+                    <select id="blitzSelect">
+                        <option value="base" selected>Base Rush (4-man)</option>
+                        <option value="zone_blitz">Zone Blitz (Fire Zone)</option>
+                        <option value="man_blitz">Man Blitz</option>
+                        <option value="a_gap_blitz">A-Gap Blitz</option>
+                        <option value="edge_blitz">Edge/DB Blitz</option>
+                        <option value="overload_blitz">Overload Blitz</option>
+                        <option value="double_a_gap">Double A-Gap Mug</option>
+                        <option value="green_dog">Green Dog</option>
+                    </select>
+                </div>
+
+                <button class="analyze-btn" onclick="analyzeDefense()">
+                    Analyze Defense
+                </button>
+
+                <div class="defense-info" id="defenseInfo" style="display: none;">
+                    <h4 id="defenseInfoTitle">Coverage Info</h4>
+                    <p id="defenseInfoDesc"></p>
+                    <div id="defenseInfoTags"></div>
+                </div>
+            </div>
+
+            <!-- Results Panel -->
+            <div>
+                <div class="loading" id="loading">
+                    <div class="spinner"></div>
+                    <p>Analyzing defensive look...</p>
+                </div>
+
+                <div class="placeholder" id="placeholder">
+                    <div class="icon">🏈</div>
+                    <h3>Select a Defense</h3>
+                    <p>Choose a formation, coverage, and blitz package, then click "Analyze Defense" to see offensive answers.</p>
+                </div>
+
+                <div class="results-panel" id="results">
+                    <!-- Diagram -->
+                    <div class="diagram-container">
+                        <h3>Coverage Diagram</h3>
+                        <div class="diagram-svg" id="diagramSvg"></div>
+                        <div class="diagram-legend">
+                            <div class="legend-item">
+                                <div class="legend-dot" style="background: #4169e1;"></div>
+                                <span>O-Line</span>
+                            </div>
+                            <div class="legend-item">
+                                <div class="legend-dot" style="background: #1e90ff;"></div>
+                                <span>Receivers</span>
+                            </div>
+                            <div class="legend-item">
+                                <div class="legend-dot" style="background: #ffd700;"></div>
+                                <span>QB</span>
+                            </div>
+                            <div class="legend-item">
+                                <div class="legend-triangle" style="border-bottom-color: #dc143c;"></div>
+                                <span>D-Line</span>
+                            </div>
+                            <div class="legend-item">
+                                <div class="legend-triangle" style="border-bottom-color: #ff6347;"></div>
+                                <span>LB</span>
+                            </div>
+                            <div class="legend-item">
+                                <div class="legend-triangle" style="border-bottom-color: #ff8c00;"></div>
+                                <span>Safety</span>
+                            </div>
+                        </div>
+                        <div class="soft-spots-info">
+                            <div class="pulse-dot"></div>
+                            <span>Green pulsing circles = Soft spots to attack</span>
+                        </div>
+                    </div>
+
+                    <!-- Key Advice -->
+                    <div class="key-advice" id="keyAdvice">
+                        <h3>Key Strategy</h3>
+                        <div class="priority" id="priorityText"></div>
+                        <div class="advice" id="adviceText"></div>
+                    </div>
+
+                    <!-- Pass Concepts -->
+                    <div class="concepts-section">
+                        <h3><span class="icon">🎯</span> Best Passing Concepts</h3>
+                        <div class="concepts-grid" id="passConceptsGrid"></div>
+                    </div>
+
+                    <!-- Run Concepts -->
+                    <div class="concepts-section">
+                        <h3><span class="icon">🏃</span> Best Run Plays</h3>
+                        <div class="concepts-grid" id="runConceptsGrid"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <p>Data sourced from Madden playbooks and NFL coaching concepts</p>
+            <p>Built by Jagjoth Bhullar</p>
+        </div>
+    </div>
+
+    <script>
+        // Update defense info on selection change
+        document.getElementById('coverageSelect').addEventListener('change', updateDefenseInfo);
+        document.getElementById('formationSelect').addEventListener('change', updateDefenseInfo);
+
+        function updateDefenseInfo() {
+            const coverage = document.getElementById('coverageSelect');
+            const formation = document.getElementById('formationSelect');
+
+            const coverageText = coverage.options[coverage.selectedIndex].text;
+            const formationText = formation.options[formation.selectedIndex].text;
+
+            document.getElementById('defenseInfo').style.display = 'block';
+            document.getElementById('defenseInfoTitle').textContent = coverageText;
+
+            // Simple descriptions
+            const descriptions = {
+                'cover_0': 'All-out blitz with pure man coverage. High risk, high reward - no safety help over top.',
+                'cover_1': 'Man coverage with a single high safety providing help. Good balance of pressure and coverage.',
+                'cover_1_robber': 'Cover 1 with a defender (usually LB/S) reading the QB and "robbing" underneath routes.',
+                'cover_2': 'Two deep safeties split the field. Corners play flats. Vulnerable in deep middle.',
+                'cover_2_man': 'Man coverage underneath with two safeties providing deep help on both sides.',
+                'tampa_2': 'Cover 2 variant where MLB drops deep to cover the middle hole.',
+                'cover_3': 'Three deep zones with two corners and FS. Four underneath. Common coverage.',
+                'cover_3_sky': 'Cover 3 with SS in flat instead of deep. Good vs run to strong side.',
+                'cover_3_cloud': 'Cover 3 with corner dropping to flat. Good for press coverage.',
+                'cover_3_match': 'Pattern-matching Cover 3 that adjusts based on receiver routes.',
+                'cover_4': 'Four deep zones (quarters). Very safe vs deep balls, soft underneath.',
+                'cover_4_palms': 'Quarters variant where safeties read #2 receiver.',
+                'cover_6': 'Split coverage - Cover 4 to one side, Cover 2 to the other.',
+                'cover_2_trap': 'Looks like Cover 2 pre-snap but safety bails to bait QB.'
+            };
+
+            document.getElementById('defenseInfoDesc').textContent = descriptions[coverage.value] || 'Select a coverage for details.';
+        }
+
+        async function analyzeDefense() {
+            const formation = document.getElementById('formationSelect').value;
+            const coverage = document.getElementById('coverageSelect').value;
+            const blitz = document.getElementById('blitzSelect').value;
+
+            // Show loading
+            document.getElementById('placeholder').style.display = 'none';
+            document.getElementById('results').classList.remove('active');
+            document.getElementById('loading').classList.add('active');
+
+            try {
+                const response = await fetch('/api/analyze', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ formation, coverage, blitz })
+                });
+
+                const data = await response.json();
+
+                document.getElementById('loading').classList.remove('active');
+
+                if (data.status === 'ok') {
+                    displayResults(data);
+                }
+
+            } catch (err) {
+                document.getElementById('loading').classList.remove('active');
+                alert('Error analyzing defense. Please try again.');
+            }
+        }
+
+        function displayResults(data) {
+            // Show results panel
+            document.getElementById('results').classList.add('active');
+
+            // Update diagram
+            document.getElementById('diagramSvg').innerHTML = data.diagram_svg;
+
+            // Update key advice
+            document.getElementById('priorityText').textContent = data.offense.priority || 'Find the soft spots in the coverage';
+            document.getElementById('adviceText').textContent = data.offense.key_advice || '';
+
+            // Update pass concepts
+            const passGrid = document.getElementById('passConceptsGrid');
+            passGrid.innerHTML = '';
+
+            data.offense.pass_concepts.forEach(concept => {
+                passGrid.innerHTML += `
+                    <div class="concept-card pass">
+                        <h4>${concept.name}</h4>
+                        <div class="routes">Routes: ${concept.routes.join(' + ')}</div>
+                        <div class="description">${concept.description}</div>
+                        <div class="why-works">
+                            <strong>Why It Works:</strong>
+                            <p>${concept.why_it_works}</p>
+                        </div>
+                        <div class="key-read">Key Read: ${concept.key_read}</div>
+                    </div>
+                `;
+            });
+
+            // Update run concepts
+            const runGrid = document.getElementById('runConceptsGrid');
+            runGrid.innerHTML = '';
+
+            data.offense.run_concepts.forEach(concept => {
+                runGrid.innerHTML += `
+                    <div class="concept-card run">
+                        <h4>${concept.name}</h4>
+                        <div class="routes">Blocking: ${concept.blocking}</div>
+                        <div class="description">${concept.description}</div>
+                        <div class="why-works">
+                            <strong>Why It Works:</strong>
+                            <p>${concept.why_it_works}</p>
+                        </div>
+                        <div class="key-read">Key Read: ${concept.key_read}</div>
+                    </div>
+                `;
+            });
+        }
+
+        // Initialize defense info on load
+        updateDefenseInfo();
+    </script>
+</body>
+</html>

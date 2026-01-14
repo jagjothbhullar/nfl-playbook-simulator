@@ -1,0 +1,271 @@
+{
+  "metadata": {
+    "version": "1.0",
+    "description": "NFL defensive formations, coverages, and blitz packages",
+    "total_combinations": "50+"
+  },
+  "formations": {
+    "4-3": {
+      "name": "4-3 Base",
+      "personnel": "4 DL, 3 LB, 4 DB",
+      "description": "Traditional base defense with 4 down linemen",
+      "strengths": ["Run defense", "Gap control", "Pass rush"],
+      "weaknesses": ["Speed in coverage", "Slot receivers", "Spread offenses"]
+    },
+    "3-4": {
+      "name": "3-4 Base",
+      "personnel": "3 DL, 4 LB, 4 DB",
+      "description": "Versatile defense with 4 linebackers for blitz flexibility",
+      "strengths": ["Blitz disguise", "Run fits", "Versatility"],
+      "weaknesses": ["Requires elite NT", "Can be gashed inside"]
+    },
+    "nickel": {
+      "name": "Nickel",
+      "personnel": "4 DL, 2 LB, 5 DB",
+      "description": "Sub package with extra DB for passing situations",
+      "strengths": ["Pass coverage", "Slot coverage", "Speed"],
+      "weaknesses": ["Run defense", "Power formations"]
+    },
+    "dime": {
+      "name": "Dime",
+      "personnel": "4 DL, 1 LB, 6 DB",
+      "description": "Pass-heavy package with 6 defensive backs",
+      "strengths": ["Deep coverage", "Prevent defense", "Multiple receivers"],
+      "weaknesses": ["Run game", "Short yardage", "Physical offense"]
+    },
+    "quarter": {
+      "name": "Quarter",
+      "personnel": "3 DL, 1 LB, 7 DB",
+      "description": "Extreme pass defense with 7 DBs",
+      "strengths": ["Hail Mary defense", "Deep shots"],
+      "weaknesses": ["Any run play", "Short passes"]
+    },
+    "goal_line": {
+      "name": "Goal Line",
+      "personnel": "5 DL, 4 LB, 2 DB",
+      "description": "Heavy formation for short yardage",
+      "strengths": ["Run stuffing", "Gap integrity"],
+      "weaknesses": ["Play action", "Speed"]
+    },
+    "big_nickel": {
+      "name": "Big Nickel",
+      "personnel": "3 DL, 3 LB, 5 DB",
+      "description": "Hybrid with extra safety instead of corner",
+      "strengths": ["TE coverage", "Run support from safety"],
+      "weaknesses": ["Speed receivers", "Outside runs"]
+    }
+  },
+  "coverages": {
+    "cover_0": {
+      "name": "Cover 0",
+      "type": "man",
+      "safeties_deep": 0,
+      "description": "Pure man coverage with no safety help - all out blitz",
+      "strengths": ["Maximum pressure", "Tight coverage"],
+      "weaknesses": ["No help over top", "One broken tackle = TD", "Double moves"],
+      "soft_spots": ["Deep", "Any 1-on-1 matchup"],
+      "common_blitz": true
+    },
+    "cover_1": {
+      "name": "Cover 1 (Man Free)",
+      "type": "man",
+      "safeties_deep": 1,
+      "description": "Man coverage with single high safety help",
+      "strengths": ["Tight coverage", "Safety help deep", "Run support"],
+      "weaknesses": ["Crossing routes", "Pick plays", "Rub routes"],
+      "soft_spots": ["Middle of field underneath", "Crossers"],
+      "common_blitz": true
+    },
+    "cover_1_robber": {
+      "name": "Cover 1 Robber",
+      "type": "man",
+      "safeties_deep": 1,
+      "description": "Cover 1 with a linebacker/safety robbing underneath routes",
+      "strengths": ["Takes away crossers", "Disguised coverage"],
+      "weaknesses": ["Deep shots", "Verticals"],
+      "soft_spots": ["Deep posts", "Go routes"],
+      "common_blitz": false
+    },
+    "cover_2": {
+      "name": "Cover 2",
+      "type": "zone",
+      "safeties_deep": 2,
+      "description": "Two deep safeties splitting the field, corners in flats",
+      "strengths": ["Deep sidelines protected", "Run support from corners"],
+      "weaknesses": ["Middle of field (hole shot)", "Deep middle", "Seams"],
+      "soft_spots": ["Deep middle between safeties", "Corner routes"],
+      "common_blitz": false
+    },
+    "cover_2_man": {
+      "name": "Cover 2 Man",
+      "type": "man",
+      "safeties_deep": 2,
+      "description": "Man coverage underneath with two deep safeties",
+      "strengths": ["Tight man coverage", "Safety help both sides"],
+      "weaknesses": ["Crossers", "Pick plays", "RB routes"],
+      "soft_spots": ["Underneath crossers", "Wheel routes"],
+      "common_blitz": true
+    },
+    "tampa_2": {
+      "name": "Tampa 2",
+      "type": "zone",
+      "safeties_deep": 2,
+      "description": "Cover 2 with MLB dropping to deep middle",
+      "strengths": ["Closes hole shot", "Seven in coverage"],
+      "weaknesses": ["Seams", "Middle linebackers in space"],
+      "soft_spots": ["Seam routes", "Deep corners"],
+      "common_blitz": false
+    },
+    "cover_3": {
+      "name": "Cover 3",
+      "type": "zone",
+      "safeties_deep": 1,
+      "description": "Three deep zones - two corners and free safety",
+      "strengths": ["Deep coverage", "Run support", "Eight in box"],
+      "weaknesses": ["Seams", "Curl-flat", "Four verticals"],
+      "soft_spots": ["Seams between corner and safety", "Flats", "Curl zones"],
+      "common_blitz": false
+    },
+    "cover_3_sky": {
+      "name": "Cover 3 Sky",
+      "type": "zone",
+      "safeties_deep": 1,
+      "description": "Cover 3 with SS in flat, FS in deep middle",
+      "strengths": ["Strong side run support", "TE coverage"],
+      "weaknesses": ["Weak side deep", "Backside post"],
+      "soft_spots": ["Weak side seam", "Backside routes"],
+      "common_blitz": false
+    },
+    "cover_3_cloud": {
+      "name": "Cover 3 Cloud",
+      "type": "zone",
+      "safeties_deep": 1,
+      "description": "Cover 3 with corner in flat, SS in deep third",
+      "strengths": ["Corner can jam and drop", "Boundary support"],
+      "weaknesses": ["Speed to flat", "Bubble screens"],
+      "soft_spots": ["Quick flats", "Boundary seam"],
+      "common_blitz": false
+    },
+    "cover_3_match": {
+      "name": "Cover 3 Match (Rip/Liz)",
+      "type": "zone",
+      "safeties_deep": 1,
+      "description": "Pattern-matching Cover 3 that converts to man on verticals",
+      "strengths": ["Adapts to routes", "Handles 4 verticals"],
+      "weaknesses": ["Complex rules", "Communication errors"],
+      "soft_spots": ["Option routes", "Settling in zones"],
+      "common_blitz": false
+    },
+    "cover_4": {
+      "name": "Cover 4 (Quarters)",
+      "type": "zone",
+      "safeties_deep": 2,
+      "description": "Four deep zones with pattern-matching rules",
+      "strengths": ["Deep ball defense", "Prevents big plays"],
+      "weaknesses": ["Underneath routes", "Flats", "Check downs"],
+      "soft_spots": ["Flats", "Curl zones", "Underneath middle"],
+      "common_blitz": false
+    },
+    "cover_4_palms": {
+      "name": "Cover 4 Palms (Poach)",
+      "type": "zone",
+      "safeties_deep": 2,
+      "description": "Quarters with safety reading #2 receiver",
+      "strengths": ["Handles verticals", "Run support"],
+      "weaknesses": ["Smash concepts", "Out routes"],
+      "soft_spots": ["Corner routes", "7 routes"],
+      "common_blitz": false
+    },
+    "cover_6": {
+      "name": "Cover 6",
+      "type": "zone",
+      "safeties_deep": 2,
+      "description": "Cover 4 to field, Cover 2 to boundary",
+      "strengths": ["Versatile", "Handles trips"],
+      "weaknesses": ["Predictable if identified", "Boundary corner route"],
+      "soft_spots": ["Boundary deep", "Field flats"],
+      "common_blitz": false
+    },
+    "cover_2_trap": {
+      "name": "Cover 2 Trap",
+      "type": "zone",
+      "safeties_deep": 1,
+      "description": "Looks like Cover 2 but safety drops to bait QB",
+      "strengths": ["Creates turnovers", "Disguised"],
+      "weaknesses": ["Leaves half field open", "Run game"],
+      "soft_spots": ["Opposite side of trap", "Run plays"],
+      "common_blitz": false
+    }
+  },
+  "blitz_packages": {
+    "base": {
+      "name": "Base Rush",
+      "rushers": 4,
+      "description": "Standard 4-man rush",
+      "coverage_behind": "Any coverage"
+    },
+    "zone_blitz": {
+      "name": "Zone Blitz (Fire Zone)",
+      "rushers": 5,
+      "description": "5-man rush with 3-deep 3-under zone behind",
+      "coverage_behind": "Cover 3",
+      "strengths": ["Confuses QB reads", "Drops DL into coverage"],
+      "weaknesses": ["Hot routes", "Quick game"],
+      "beaters": ["Hot routes", "Sight adjustments", "Quick slants"]
+    },
+    "man_blitz": {
+      "name": "Man Blitz",
+      "rushers": 5,
+      "description": "5-man rush with man coverage behind",
+      "coverage_behind": "Cover 1 or Cover 0",
+      "strengths": ["Tight coverage", "Extra rusher"],
+      "weaknesses": ["1-on-1 matchups", "No help"],
+      "beaters": ["Quick passes", "Screens", "Hot routes"]
+    },
+    "a_gap_blitz": {
+      "name": "A-Gap Blitz",
+      "rushers": 5,
+      "description": "Interior blitz through A-gaps",
+      "coverage_behind": "Cover 1",
+      "strengths": ["Quick pressure", "Collapses pocket"],
+      "weaknesses": ["Outside runs", "Quick throws"],
+      "beaters": ["Quick slants", "RB check releases"]
+    },
+    "edge_blitz": {
+      "name": "Edge/DB Blitz",
+      "rushers": 5,
+      "description": "Corner or safety blitzing off edge",
+      "coverage_behind": "Cover 1 or Cover 3",
+      "strengths": ["Free rusher", "Speed"],
+      "weaknesses": ["Blitzer's area exposed", "Play action"],
+      "beaters": ["Throw to vacated area", "Max protect"]
+    },
+    "overload_blitz": {
+      "name": "Overload Blitz",
+      "rushers": 6,
+      "description": "Overload one side with more rushers than blockers",
+      "coverage_behind": "Cover 0 or Cover 1",
+      "strengths": ["Unblockable rusher", "Forces hot throw"],
+      "weaknesses": ["Backside routes", "Big play risk"],
+      "beaters": ["Backside slant", "Screen away from pressure"]
+    },
+    "double_a_gap": {
+      "name": "Double A-Gap Mug",
+      "rushers": 4,
+      "description": "Two LBs in A-gaps pre-snap, may or may not blitz",
+      "coverage_behind": "Any",
+      "strengths": ["Disrupts protection calls", "Confusing"],
+      "weaknesses": ["May not bring pressure", "Can be picked up"],
+      "beaters": ["Identify post-snap", "Slide protection"]
+    },
+    "green_dog": {
+      "name": "Green Dog",
+      "rushers": 5,
+      "description": "LB blitzes if his man (RB) stays in to block",
+      "coverage_behind": "Man",
+      "strengths": ["Free rusher vs max protect", "Situational"],
+      "weaknesses": ["RB releases late", "Check release"],
+      "beaters": ["RB delay routes", "Late releases"]
+    }
+  }
+}

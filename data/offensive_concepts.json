@@ -1,0 +1,533 @@
+{
+  "metadata": {
+    "version": "1.0",
+    "description": "Offensive concepts that beat specific defensive coverages"
+  },
+  "pass_concepts": {
+    "four_verticals": {
+      "name": "Four Verticals",
+      "routes": ["Go", "Seam", "Seam", "Go"],
+      "description": "All 4 eligible receivers run vertical routes, reading coverage",
+      "beats": ["cover_3", "cover_1", "cover_2"],
+      "why_it_works": {
+        "cover_3": "4 vertical threats vs 3 deep defenders - seams are open",
+        "cover_1": "Tests man coverage, safety can't help everyone",
+        "cover_2": "Attacks deep middle hole between safeties"
+      },
+      "key_read": "Read safety - throw opposite his movement",
+      "hot_adjustment": "Inside receivers can sit vs blitz"
+    },
+    "smash": {
+      "name": "Smash Concept",
+      "routes": ["Hitch", "Corner"],
+      "description": "High-low read on corner - hitch underneath, corner over top",
+      "beats": ["cover_2", "cover_4", "tampa_2"],
+      "why_it_works": {
+        "cover_2": "Corner route splits corner and safety",
+        "cover_4": "Corner can't cover both hitch and corner route",
+        "tampa_2": "Same as Cover 2 - corners are vulnerable"
+      },
+      "key_read": "Read the corner - if he squats on hitch, throw corner",
+      "hot_adjustment": "Hitch becomes hot route vs pressure"
+    },
+    "curl_flat": {
+      "name": "Curl-Flat",
+      "routes": ["Curl", "Flat"],
+      "description": "High-low read on flat defender",
+      "beats": ["cover_3", "cover_3_sky", "cover_3_cloud"],
+      "why_it_works": {
+        "cover_3": "Flat defender can't cover curl and flat - pick your poison",
+        "cover_3_sky": "SS in flat can be out-leveraged",
+        "cover_3_cloud": "Corner in flat creates window for curl"
+      },
+      "key_read": "Read flat defender - throw opposite his drop",
+      "hot_adjustment": "Flat is hot vs blitz"
+    },
+    "levels": {
+      "name": "Levels Concept",
+      "routes": ["Shallow Cross", "Dig/In"],
+      "description": "Two crossing routes at different depths",
+      "beats": ["cover_1", "cover_2_man", "cover_0", "man_blitz"],
+      "why_it_works": {
+        "cover_1": "Crossers create natural picks in man coverage",
+        "cover_2_man": "Hard to stay in phase through traffic",
+        "cover_0": "Quick throw beats pressure, picks help",
+        "man_blitz": "Natural rubs, quick release"
+      },
+      "key_read": "Throw to receiver who comes open first",
+      "hot_adjustment": "Shallow is automatic hot"
+    },
+    "mesh": {
+      "name": "Mesh Concept",
+      "routes": ["Shallow Cross", "Shallow Cross", "Sit"],
+      "description": "Two receivers cross underneath, creating picks",
+      "beats": ["cover_1", "cover_2_man", "cover_0"],
+      "why_it_works": {
+        "cover_1": "Natural pick as receivers cross - illegal contact",
+        "cover_2_man": "Defenders run into each other",
+        "cover_0": "Creates immediate separation"
+      },
+      "key_read": "Throw to first crosser who pops open",
+      "hot_adjustment": "First crosser is hot"
+    },
+    "drive": {
+      "name": "Drive Concept",
+      "routes": ["Shallow Cross", "Dig", "Deep Cross"],
+      "description": "Three-level crossing concept",
+      "beats": ["cover_3", "cover_4", "zone_blitz"],
+      "why_it_works": {
+        "cover_3": "Sits in zone holes at three levels",
+        "cover_4": "Underneath zones are soft",
+        "zone_blitz": "Finds soft spots in fire zone"
+      },
+      "key_read": "Read high to low - dig, shallow, check down",
+      "hot_adjustment": "Shallow is hot"
+    },
+    "dagger": {
+      "name": "Dagger Concept",
+      "routes": ["Post", "Dig"],
+      "description": "Post clears out safety, dig sits underneath",
+      "beats": ["cover_1", "cover_3", "cover_1_robber"],
+      "why_it_works": {
+        "cover_1": "Post holds safety, dig is wide open",
+        "cover_3": "Post occupies FS, dig finds hole",
+        "cover_1_robber": "Clears robber with post"
+      },
+      "key_read": "Post is primary if 1-on-1, dig if safety helps",
+      "hot_adjustment": "Dig can be hot"
+    },
+    "double_post": {
+      "name": "Double Post (Mills)",
+      "routes": ["Post", "Post"],
+      "description": "Two post routes bracketing the safety",
+      "beats": ["cover_1", "cover_3", "cover_2_trap"],
+      "why_it_works": {
+        "cover_1": "Safety can only help one side",
+        "cover_3": "FS has to choose - either post is open",
+        "cover_2_trap": "Trapping safety leaves other post open"
+      },
+      "key_read": "Throw opposite safety's lean",
+      "hot_adjustment": "Hot to RB or quick out"
+    },
+    "flood": {
+      "name": "Flood Concept",
+      "routes": ["Go/Clear", "Corner/Out", "Flat"],
+      "description": "Three receivers flood one side at three levels",
+      "beats": ["cover_3", "cover_2", "cover_4"],
+      "why_it_works": {
+        "cover_3": "3 routes vs 2 defenders to that side",
+        "cover_2": "Corner route beats corner, flat beats LB",
+        "cover_4": "Same principle - outnumber the coverage"
+      },
+      "key_read": "High-low read on flat defender, then corner",
+      "hot_adjustment": "Flat is hot"
+    },
+    "scissors": {
+      "name": "Scissors Concept",
+      "routes": ["Post", "Corner"],
+      "description": "Post and corner cross, creating natural pick",
+      "beats": ["cover_2_man", "cover_1", "cover_4_palms"],
+      "why_it_works": {
+        "cover_2_man": "Defenders collide at crossing point",
+        "cover_1": "Pick disrupts man coverage",
+        "cover_4_palms": "Pattern-match gets confused"
+      },
+      "key_read": "Throw to receiver who gets free at cross",
+      "hot_adjustment": "Corner is hot vs pressure"
+    },
+    "yankee": {
+      "name": "Yankee/Sail",
+      "routes": ["Go", "Corner", "Out/Flat"],
+      "description": "Three-level stretch to boundary",
+      "beats": ["cover_2", "cover_4", "cover_6"],
+      "why_it_works": {
+        "cover_2": "Corner route in hole, go clears safety",
+        "cover_4": "Too many routes for pattern match",
+        "cover_6": "Attacks cover 2 side"
+      },
+      "key_read": "Corner route usually open, check go if 1-on-1",
+      "hot_adjustment": "Out/flat is hot"
+    },
+    "china": {
+      "name": "China Concept",
+      "routes": ["Deep Cross", "Drag"],
+      "description": "Deep crosser with underneath drag",
+      "beats": ["cover_3", "cover_4", "tampa_2"],
+      "why_it_works": {
+        "cover_3": "Deep cross finds hole behind LBs",
+        "cover_4": "Underneath zones are soft",
+        "tampa_2": "Cross gets behind dropping MLB"
+      },
+      "key_read": "Deep cross primary, drag check down",
+      "hot_adjustment": "Drag is hot"
+    },
+    "slant_flat": {
+      "name": "Slant-Flat",
+      "routes": ["Slant", "Flat"],
+      "description": "Quick game high-low on flat defender",
+      "beats": ["cover_3", "cover_2", "zone_blitz"],
+      "why_it_works": {
+        "cover_3": "Flat defender vacates for slant",
+        "cover_2": "LB can't cover both",
+        "zone_blitz": "Quick throw beats pressure"
+      },
+      "key_read": "Flat defender - throw opposite",
+      "hot_adjustment": "Slant is hot"
+    },
+    "post_wheel": {
+      "name": "Post-Wheel",
+      "routes": ["Post", "Wheel"],
+      "description": "RB wheel with post clearing safety",
+      "beats": ["cover_1", "cover_3", "man_blitz"],
+      "why_it_works": {
+        "cover_1": "LB can't cover RB wheel",
+        "cover_3": "Wheel is uncovered in flat",
+        "man_blitz": "RB vs LB mismatch"
+      },
+      "key_read": "Post if safety stays, wheel if safety jumps",
+      "hot_adjustment": "RB check release"
+    },
+    "spacing": {
+      "name": "Spacing Concept",
+      "routes": ["Snag/Hitch", "Flat", "Speed Out"],
+      "description": "Three underneath receivers creating spacing",
+      "beats": ["cover_4", "cover_6", "tampa_2"],
+      "why_it_works": {
+        "cover_4": "Only 3 underneath defenders",
+        "cover_6": "Underneath is soft",
+        "tampa_2": "Creates 3-on-2 underneath"
+      },
+      "key_read": "Find open grass, throw to most open",
+      "hot_adjustment": "Snag is hot"
+    },
+    "stick": {
+      "name": "Stick Concept",
+      "routes": ["Stick/Hitch", "Flat", "Vertical"],
+      "description": "Quick game with vertical clear out",
+      "beats": ["cover_3", "cover_4", "zone_blitz"],
+      "why_it_works": {
+        "cover_3": "High-low on flat defender",
+        "cover_4": "Quick throw to open zone",
+        "zone_blitz": "Beats fire zone with quick hit"
+      },
+      "key_read": "Flat defender determines throw",
+      "hot_adjustment": "Stick is hot"
+    },
+    "out_n_up": {
+      "name": "Out-and-Up (Sluggo)",
+      "routes": ["Slant-Go", "Out-and-Up"],
+      "description": "Double move to beat aggressive coverage",
+      "beats": ["cover_1", "cover_2_man", "cover_0"],
+      "why_it_works": {
+        "cover_1": "Aggressive man coverage bites on first move",
+        "cover_2_man": "DB commits to underneath route",
+        "cover_0": "High reward vs no safety help"
+      },
+      "key_read": "Must have time - needs max protect",
+      "hot_adjustment": "Quick out if blitz"
+    },
+    "snag": {
+      "name": "Snag Concept",
+      "routes": ["Snag/Spot", "Corner", "Flat"],
+      "description": "Triangle read with spot route as primary",
+      "beats": ["cover_3", "cover_2", "cover_4"],
+      "why_it_works": {
+        "cover_3": "Snag sits in LB zone",
+        "cover_2": "Corner route is money",
+        "cover_4": "Snag underneath open"
+      },
+      "key_read": "Triangle - snag, corner, flat",
+      "hot_adjustment": "Flat or snag hot"
+    }
+  },
+  "run_concepts": {
+    "inside_zone": {
+      "name": "Inside Zone",
+      "blocking": "Zone left/right",
+      "description": "O-line blocks zone, RB reads backside A-gap",
+      "beats": ["cover_4", "cover_2", "dime", "quarter"],
+      "why_it_works": {
+        "cover_4": "Light box, only 6-7 defenders",
+        "cover_2": "Safeties deep, can't support",
+        "dime": "Only 5 in box",
+        "quarter": "Almost no run support"
+      },
+      "key_read": "RB reads backside LB - cut or stay"
+    },
+    "outside_zone": {
+      "name": "Outside Zone (Stretch)",
+      "blocking": "Reach blocks, stretch playside",
+      "description": "Stretch play forcing defense to run sideline to sideline",
+      "beats": ["3-4", "cover_3", "cover_1"],
+      "why_it_works": {
+        "3-4": "Tests edge contain",
+        "cover_3": "SS in coverage can't support quickly",
+        "cover_1": "Safety deep, no alley support"
+      },
+      "key_read": "RB reads DE - cut up or bounce"
+    },
+    "power": {
+      "name": "Power",
+      "blocking": "Down blocks, pulling guard",
+      "description": "Gap scheme with guard pulling to kick out",
+      "beats": ["4-3", "nickel", "cover_2"],
+      "why_it_works": {
+        "4-3": "Creates double team at POA",
+        "nickel": "Physical play vs light personnel",
+        "cover_2": "Can't load box"
+      },
+      "key_read": "Follow the pulling guard"
+    },
+    "counter": {
+      "name": "Counter",
+      "blocking": "Down blocks, guard and tackle pull",
+      "description": "Misdirection run with pulling OL",
+      "beats": ["cover_3", "4-3", "zone_blitz"],
+      "why_it_works": {
+        "cover_3": "LBs flow wrong way",
+        "4-3": "Misdirection freezes LBs",
+        "zone_blitz": "Blitzers run themselves out of play"
+      },
+      "key_read": "Follow pullers, cut off tackle block"
+    },
+    "trap": {
+      "name": "Trap",
+      "blocking": "Guard pulls inside to kick DT",
+      "description": "Quick hitting trap through A-gap",
+      "beats": ["3-4", "4-3", "a_gap_blitz"],
+      "why_it_works": {
+        "3-4": "Traps penetrating DL",
+        "4-3": "Uses DT aggression against him",
+        "a_gap_blitz": "Blitzer gets kicked out"
+      },
+      "key_read": "Hit fast behind trap block"
+    },
+    "draw": {
+      "name": "Draw",
+      "blocking": "Pass set, then block",
+      "description": "Fake pass, delayed handoff",
+      "beats": ["man_blitz", "a_gap_blitz", "edge_blitz", "dime"],
+      "why_it_works": {
+        "man_blitz": "Pass rushers run past RB",
+        "a_gap_blitz": "LBs vacate running lanes",
+        "edge_blitz": "Interior is soft",
+        "dime": "Light box"
+      },
+      "key_read": "RB reads blocks, finds lane"
+    },
+    "dive": {
+      "name": "Dive/Plunge",
+      "blocking": "Double team at POA",
+      "description": "Quick hitting A-gap run",
+      "beats": ["nickel", "dime", "cover_4"],
+      "why_it_works": {
+        "nickel": "Light box, quick hit",
+        "dime": "No stacked LBs",
+        "cover_4": "Soft front"
+      },
+      "key_read": "Just hit it"
+    },
+    "toss": {
+      "name": "Toss/Pitch",
+      "blocking": "Reach blocks, pullers lead",
+      "description": "Outside run with pitch to RB",
+      "beats": ["4-3", "goal_line", "cover_0"],
+      "why_it_works": {
+        "4-3": "Tests edge speed",
+        "goal_line": "Gets outside heavy formation",
+        "cover_0": "All defenders in box but no edge"
+      },
+      "key_read": "Get to edge quickly"
+    },
+    "sweep": {
+      "name": "Sweep (Pin & Pull)",
+      "blocking": "Playside pins, backside pulls",
+      "description": "Multiple pullers lead around edge",
+      "beats": ["3-4", "cover_3_sky", "cover_1"],
+      "why_it_works": {
+        "3-4": "Numbers advantage at edge",
+        "cover_3_sky": "SS in coverage, no force",
+        "cover_1": "Safety can't get there in time"
+      },
+      "key_read": "Follow wall of blockers"
+    },
+    "iso": {
+      "name": "Iso (Isolation)",
+      "blocking": "FB kicks LB, line seals",
+      "description": "Fullback leads through hole to block LB",
+      "beats": ["4-3", "3-4", "cover_3"],
+      "why_it_works": {
+        "4-3": "FB gets clean shot on MLB",
+        "3-4": "Interior LB isolated",
+        "cover_3": "LBs can't scrape"
+      },
+      "key_read": "Follow FB through hole"
+    },
+    "stretch": {
+      "name": "Wide Zone/Stretch",
+      "blocking": "Wide zone reach",
+      "description": "Maximum stretch run to sideline",
+      "beats": ["cover_4", "cover_6", "tampa_2"],
+      "why_it_works": {
+        "cover_4": "Safeties can't support edge",
+        "cover_6": "Cover 2 side weak vs run",
+        "tampa_2": "MLB deep, can't fill"
+      },
+      "key_read": "Patience, then cut"
+    },
+    "duo": {
+      "name": "Duo",
+      "blocking": "Double teams up to LBs",
+      "description": "Power zone scheme with double teams",
+      "beats": ["nickel", "3-4", "cover_2"],
+      "why_it_works": {
+        "nickel": "Physical vs light box",
+        "3-4": "Caves in nose tackle",
+        "cover_2": "Only 6 in box"
+      },
+      "key_read": "RB presses then cuts"
+    },
+    "screen_rb": {
+      "name": "RB Screen",
+      "blocking": "Let rushers go, release OL",
+      "description": "Fake pass, throw to RB behind LOS",
+      "beats": ["man_blitz", "overload_blitz", "edge_blitz", "cover_0"],
+      "why_it_works": {
+        "man_blitz": "Rushers overrun, blockers set up",
+        "overload_blitz": "Throw opposite the overload",
+        "edge_blitz": "Screen away from blitz",
+        "cover_0": "Gets ball out quick, space to run"
+      },
+      "key_read": "Set up blockers, deliver ball"
+    },
+    "screen_wr": {
+      "name": "WR Screen (Tunnel/Bubble)",
+      "blocking": "WRs block, quick throw",
+      "description": "Quick screen to outside receiver",
+      "beats": ["cover_3", "cover_1", "man_blitz", "zone_blitz"],
+      "why_it_works": {
+        "cover_3": "Flat defender is LB, too slow",
+        "cover_1": "Gets ball in space",
+        "man_blitz": "Quick throw beats pressure",
+        "zone_blitz": "Edge soft with fire zone"
+      },
+      "key_read": "Get it out quick, let athletes work"
+    }
+  },
+  "coverage_beaters": {
+    "cover_0": {
+      "best_pass": ["mesh", "levels", "out_n_up", "four_verticals"],
+      "best_run": ["draw", "screen_rb", "toss"],
+      "priority": "Quick throws or take shot deep - no safety help",
+      "key_advice": "Must get ball out fast or you're sacked. Hot routes are essential."
+    },
+    "cover_1": {
+      "best_pass": ["mesh", "levels", "dagger", "double_post", "four_verticals"],
+      "best_run": ["outside_zone", "sweep", "screen_rb"],
+      "priority": "Crossing routes beat man, posts hold safety",
+      "key_advice": "Use picks/rubs to free receivers. Attack where safety can't help."
+    },
+    "cover_1_robber": {
+      "best_pass": ["four_verticals", "double_post", "dagger"],
+      "best_run": ["outside_zone", "counter"],
+      "priority": "Go over the robber with verticals",
+      "key_advice": "Robber takes away middle - go deep."
+    },
+    "cover_2": {
+      "best_pass": ["smash", "four_verticals", "flood", "yankee"],
+      "best_run": ["inside_zone", "power", "duo"],
+      "priority": "Attack middle deep (hole shot) or corner routes",
+      "key_advice": "The hole between safeties is the key. Corner routes beat corners."
+    },
+    "cover_2_man": {
+      "best_pass": ["mesh", "levels", "scissors", "post_wheel"],
+      "best_run": ["inside_zone", "duo", "draw"],
+      "priority": "Crossing routes create picks",
+      "key_advice": "Rub routes and crosses beat man. RB wheel beats LB."
+    },
+    "tampa_2": {
+      "best_pass": ["four_verticals", "smash", "china", "spacing"],
+      "best_run": ["inside_zone", "stretch", "duo"],
+      "priority": "Seams and corners - MLB can't cover everything",
+      "key_advice": "Hit seams before MLB gets depth. Corner routes still work."
+    },
+    "cover_3": {
+      "best_pass": ["curl_flat", "four_verticals", "flood", "slant_flat", "dagger"],
+      "best_run": ["counter", "outside_zone", "iso"],
+      "priority": "Seams and curl-flat - 4 vs 3 deep wins",
+      "key_advice": "High-low the flat defender. Attack seams between corner and safety."
+    },
+    "cover_3_sky": {
+      "best_pass": ["curl_flat", "four_verticals", "flood"],
+      "best_run": ["outside_zone", "counter", "sweep"],
+      "priority": "Weak side is vulnerable",
+      "key_advice": "SS in flat means weak side deep is open. Attack backside."
+    },
+    "cover_3_cloud": {
+      "best_pass": ["curl_flat", "slant_flat", "flood"],
+      "best_run": ["outside_zone", "toss", "screen_wr"],
+      "priority": "Quick flats beat corner",
+      "key_advice": "Corner in flat is slow to react - quick game wins."
+    },
+    "cover_3_match": {
+      "best_pass": ["spacing", "stick", "drive"],
+      "best_run": ["inside_zone", "counter"],
+      "priority": "Sit routes confuse pattern match",
+      "key_advice": "Routes that sit in zones cause communication issues."
+    },
+    "cover_4": {
+      "best_pass": ["smash", "flood", "spacing", "stick", "curl_flat"],
+      "best_run": ["inside_zone", "stretch", "dive"],
+      "priority": "Underneath routes - flats and curls wide open",
+      "key_advice": "They're protecting deep - take the easy underneath."
+    },
+    "cover_4_palms": {
+      "best_pass": ["smash", "scissors", "yankee"],
+      "best_run": ["inside_zone", "duo"],
+      "priority": "Corner routes and smash",
+      "key_advice": "Safety reads #2 - smash concept creates conflict."
+    },
+    "cover_6": {
+      "best_pass": ["flood", "yankee", "smash"],
+      "best_run": ["inside_zone", "stretch"],
+      "priority": "Attack the Cover 2 side",
+      "key_advice": "Identify which side is Cover 2 and attack it with corners."
+    },
+    "cover_2_trap": {
+      "best_pass": ["double_post", "four_verticals"],
+      "best_run": ["inside_zone", "power"],
+      "priority": "Throw opposite the trap",
+      "key_advice": "If safety jumps one side, the other is wide open."
+    },
+    "zone_blitz": {
+      "best_pass": ["slant_flat", "drive", "stick", "screen_wr"],
+      "best_run": ["draw", "counter", "screen_rb"],
+      "priority": "Quick throws to hot routes",
+      "key_advice": "Get ball out fast. Find the vacated area. Sight adjust."
+    },
+    "man_blitz": {
+      "best_pass": ["mesh", "levels", "screen_rb", "post_wheel"],
+      "best_run": ["draw", "screen_rb", "trap"],
+      "priority": "Hot routes and screens",
+      "key_advice": "Beat man with picks. Beat blitz with quick throws and screens."
+    },
+    "a_gap_blitz": {
+      "best_pass": ["slant_flat", "screen_rb", "levels"],
+      "best_run": ["trap", "draw", "toss"],
+      "priority": "Quick slants and traps",
+      "key_advice": "Interior blitz opens up middle. Trap the blitzer or throw quick."
+    },
+    "edge_blitz": {
+      "best_pass": ["slant_flat", "flood", "screen_wr"],
+      "best_run": ["counter", "trap", "draw"],
+      "priority": "Throw to vacated area",
+      "key_advice": "Blitzer's zone is empty - attack it immediately."
+    },
+    "overload_blitz": {
+      "best_pass": ["screen_rb", "slant_flat", "four_verticals"],
+      "best_run": ["screen_rb", "draw", "counter"],
+      "priority": "Screen away from overload, or throw hot",
+      "key_advice": "High risk/reward for defense. Make them pay with big play."
+    }
+  }
+}
