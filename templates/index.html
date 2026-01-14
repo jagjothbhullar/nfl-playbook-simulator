@@ -224,6 +224,97 @@
             border-bottom: 14px solid;
         }
 
+        /* Coverage Analysis Card */
+        .coverage-analysis {
+            background: rgba(0, 0, 0, 0.5);
+            border: 2px solid #e63946;
+            border-radius: 10px;
+            padding: 25px;
+            margin-bottom: 25px;
+        }
+
+        .coverage-analysis h3 {
+            font-family: 'Russo One', sans-serif;
+            color: #e63946;
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+        }
+
+        .coverage-analysis .description {
+            color: #ccc;
+            line-height: 1.7;
+            margin-bottom: 20px;
+            font-size: 1.05rem;
+        }
+
+        .analysis-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 700px) {
+            .analysis-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .analysis-box {
+            padding: 15px;
+            border-radius: 8px;
+        }
+
+        .analysis-box.stops {
+            background: rgba(230, 57, 70, 0.15);
+            border-left: 4px solid #e63946;
+        }
+
+        .analysis-box.works {
+            background: rgba(76, 175, 80, 0.15);
+            border-left: 4px solid #4caf50;
+        }
+
+        .analysis-box.wont-work {
+            background: rgba(255, 152, 0, 0.15);
+            border-left: 4px solid #ff9800;
+        }
+
+        .analysis-box h4 {
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+            letter-spacing: 1px;
+        }
+
+        .analysis-box.stops h4 { color: #e63946; }
+        .analysis-box.works h4 { color: #4caf50; }
+        .analysis-box.wont-work h4 { color: #ff9800; }
+
+        .analysis-box ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .analysis-box li {
+            color: #bbb;
+            padding: 5px 0;
+            padding-left: 15px;
+            position: relative;
+            font-size: 0.95rem;
+            line-height: 1.4;
+        }
+
+        .analysis-box li::before {
+            content: '•';
+            position: absolute;
+            left: 0;
+        }
+
+        .analysis-box.stops li::before { color: #e63946; }
+        .analysis-box.works li::before { color: #4caf50; }
+        .analysis-box.wont-work li::before { color: #ff9800; }
+
         /* Key Advice */
         .key-advice {
             background: linear-gradient(135deg, rgba(76, 175, 80, 0.2) 0%, rgba(76, 175, 80, 0.1) 100%);
@@ -545,6 +636,30 @@
                         </div>
                     </div>
 
+                    <!-- Coverage Analysis -->
+                    <div class="coverage-analysis" id="coverageAnalysis">
+                        <h3 id="coverageName">Coverage Analysis</h3>
+                        <div class="description" id="coverageDescription"></div>
+
+                        <div class="analysis-grid">
+                            <div class="analysis-box stops">
+                                <h4>Designed to Stop</h4>
+                                <ul id="designedToStop"></ul>
+                            </div>
+                            <div class="analysis-box wont-work">
+                                <h4>What Won't Work</h4>
+                                <ul id="whatWontWork"></ul>
+                            </div>
+                        </div>
+
+                        <div class="analysis-grid" style="margin-top: 15px;">
+                            <div class="analysis-box works">
+                                <h4>What Works Against It</h4>
+                                <ul id="whatWorks"></ul>
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- Key Advice -->
                     <div class="key-advice" id="keyAdvice">
                         <h3>Key Strategy</h3>
@@ -575,9 +690,57 @@
     </div>
 
     <script>
+        // Coverage/Blitz compatibility
+        const coverageBlitzRules = {
+            // Man coverages - can blitz freely
+            'cover_0': ['base', 'man_blitz', 'a_gap_blitz', 'edge_blitz', 'overload_blitz', 'double_a_gap', 'green_dog'],
+            'cover_1': ['base', 'man_blitz', 'a_gap_blitz', 'edge_blitz', 'overload_blitz', 'double_a_gap', 'green_dog'],
+            'cover_1_robber': ['base', 'man_blitz', 'a_gap_blitz', 'double_a_gap'],
+            'cover_2_man': ['base', 'man_blitz', 'a_gap_blitz', 'edge_blitz', 'double_a_gap', 'green_dog'],
+
+            // Zone coverages - can use zone blitz (fire zone)
+            'cover_2': ['base', 'zone_blitz'],
+            'tampa_2': ['base', 'zone_blitz'],
+            'cover_3': ['base', 'zone_blitz', 'edge_blitz'],
+            'cover_3_sky': ['base', 'zone_blitz'],
+            'cover_3_cloud': ['base', 'zone_blitz'],
+            'cover_3_match': ['base', 'zone_blitz'],
+
+            // Deep zone coverages - base rush only (need 4 deep)
+            'cover_4': ['base'],
+            'cover_4_palms': ['base'],
+            'cover_6': ['base'],
+            'cover_2_trap': ['base']
+        };
+
         // Update defense info on selection change
-        document.getElementById('coverageSelect').addEventListener('change', updateDefenseInfo);
+        document.getElementById('coverageSelect').addEventListener('change', function() {
+            updateDefenseInfo();
+            updateBlitzOptions();
+        });
         document.getElementById('formationSelect').addEventListener('change', updateDefenseInfo);
+
+        function updateBlitzOptions() {
+            const coverage = document.getElementById('coverageSelect').value;
+            const blitzSelect = document.getElementById('blitzSelect');
+            const validBlitzes = coverageBlitzRules[coverage] || ['base'];
+
+            // Update each option's disabled state
+            Array.from(blitzSelect.options).forEach(option => {
+                if (validBlitzes.includes(option.value)) {
+                    option.disabled = false;
+                    option.style.color = '';
+                } else {
+                    option.disabled = true;
+                    option.style.color = '#666';
+                }
+            });
+
+            // If current selection is invalid, switch to base
+            if (!validBlitzes.includes(blitzSelect.value)) {
+                blitzSelect.value = 'base';
+            }
+        }
 
         function updateDefenseInfo() {
             const coverage = document.getElementById('coverageSelect');
@@ -601,10 +764,10 @@
                 'cover_3_sky': 'Cover 3 with SS in flat instead of deep. Good vs run to strong side.',
                 'cover_3_cloud': 'Cover 3 with corner dropping to flat. Good for press coverage.',
                 'cover_3_match': 'Pattern-matching Cover 3 that adjusts based on receiver routes.',
-                'cover_4': 'Four deep zones (quarters). Very safe vs deep balls, soft underneath.',
-                'cover_4_palms': 'Quarters variant where safeties read #2 receiver.',
-                'cover_6': 'Split coverage - Cover 4 to one side, Cover 2 to the other.',
-                'cover_2_trap': 'Looks like Cover 2 pre-snap but safety bails to bait QB.'
+                'cover_4': 'Four deep zones (quarters). Very safe vs deep balls, soft underneath. Base rush only - can\'t blitz with 4 deep.',
+                'cover_4_palms': 'Quarters variant where safeties read #2 receiver. Base rush only.',
+                'cover_6': 'Split coverage - Cover 4 to one side, Cover 2 to the other. Base rush only.',
+                'cover_2_trap': 'Looks like Cover 2 pre-snap but safety bails to bait QB. Base rush only.'
             };
 
             document.getElementById('defenseInfoDesc').textContent = descriptions[coverage.value] || 'Select a coverage for details.';
@@ -647,6 +810,35 @@
 
             // Update diagram
             document.getElementById('diagramSvg').innerHTML = data.diagram_svg;
+
+            // Update coverage analysis
+            const covInfo = data.defense.coverage_info;
+            document.getElementById('coverageName').textContent = covInfo.name + ' Analysis';
+            document.getElementById('coverageDescription').textContent = covInfo.description || '';
+
+            // Designed to stop
+            const stopsEl = document.getElementById('designedToStop');
+            if (covInfo.designed_to_stop && covInfo.designed_to_stop.length > 0) {
+                stopsEl.innerHTML = covInfo.designed_to_stop.map(item => `<li>${item}</li>`).join('');
+            } else {
+                stopsEl.innerHTML = '<li>Standard offensive concepts</li>';
+            }
+
+            // What won't work
+            const wontWorkEl = document.getElementById('whatWontWork');
+            if (covInfo.what_wont_work && covInfo.what_wont_work.length > 0) {
+                wontWorkEl.innerHTML = covInfo.what_wont_work.map(item => `<li>${item}</li>`).join('');
+            } else {
+                wontWorkEl.innerHTML = '<li>Slow developing plays</li>';
+            }
+
+            // What works
+            const worksEl = document.getElementById('whatWorks');
+            if (covInfo.what_works && covInfo.what_works.length > 0) {
+                worksEl.innerHTML = covInfo.what_works.map(item => `<li>${item}</li>`).join('');
+            } else {
+                worksEl.innerHTML = '<li>Attack the soft spots shown in diagram</li>';
+            }
 
             // Update key advice
             document.getElementById('priorityText').textContent = data.offense.priority || 'Find the soft spots in the coverage';
@@ -691,8 +883,9 @@
             });
         }
 
-        // Initialize defense info on load
+        // Initialize on load
         updateDefenseInfo();
+        updateBlitzOptions();
     </script>
 </body>
 </html>
